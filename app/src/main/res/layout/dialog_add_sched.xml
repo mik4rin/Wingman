@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingHorizontal="16dp"
+    android:background="@drawable/bgborder"
+    android:layout_gravity="center"
+    android:animateLayoutChanges="true"
+    android:minHeight="200dp"
+    android:paddingVertical="12dp">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:paddingHorizontal="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="12dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="15dp">
+
+            <TextView
+                android:id="@+id/dialog_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="@font/dm_sans_semibold"
+                android:text="Add New Schedule"
+                android:textColor="@color/blue"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:paddingLeft="12dp"/>
+
+            <ImageButton
+                android:id="@+id/close_btn"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Close"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_x"
+                app:tint="@color/blue"/>
+        </LinearLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Enter schedule title"
+            app:hintTextColor="@color/blue"
+            app:boxStrokeColor="@color/blue"
+            app:boxStrokeWidth="1dp"
+            android:padding="5dp"
+            android:layout_marginBottom="5dp">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/new_sched_title"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:singleLine="true"
+                android:maxLines="1"
+                android:fontFamily="@font/dm_sans_semibold"
+                android:padding="12dp"
+                android:textSize="16sp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Enter schedule description"
+            app:hintTextColor="@color/blue"
+            app:boxStrokeColor="@color/blue"
+            app:boxStrokeWidth="1dp"
+            android:padding="5dp"
+            android:layout_marginBottom="5dp">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/new_sched_desc"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textMultiLine"
+                android:minLines="4"
+                android:gravity="top|start"
+                android:fontFamily="@font/dm_sans_semibold"
+                android:padding="15dp"
+                android:textSize="16sp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Schedule Type"
+            app:hintTextColor="@color/blue"
+            app:boxStrokeColor="@color/blue"
+            app:boxStrokeWidth="1dp"
+            app:boxCornerRadiusTopStart="5dp"
+            app:boxCornerRadiusTopEnd="5dp"
+            app:boxCornerRadiusBottomStart="5dp"
+            app:boxCornerRadiusBottomEnd="5dp"
+            android:padding="5dp"
+            android:layout_marginBottom="8dp">
+
+            <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                android:id="@+id/new_sched_type"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:padding="12dp"
+                android:fontFamily="@font/dm_sans_semibold"
+                android:gravity="center"
+                android:textSize="16sp"
+                android:hint="Schedule Type"
+                android:textColor="@color/blue"
+                android:focusable="false"
+                android:clickable="true" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:orientation="horizontal"
+            android:gravity="right">
+
+            <TextView
+                android:id="@+id/selected_date_text"
+                android:layout_width="130dp"
+                android:layout_height="match_parent"
+                android:fontFamily="@font/dm_sans_semibold"
+                android:gravity="center"
+                android:padding="8dp"
+                android:text="12/30/2000"
+                android:textColor="@color/blue"
+                android:textSize="14sp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/select_date_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:padding="0dp"
+                android:backgroundTint="@color/transparent"
+                app:icon="@drawable/ic_date"
+                app:iconTint="@color/blue"
+                app:iconSize="28dp"
+                app:iconPadding="16dp"
+                app:cornerRadius="8dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:paddingHorizontal="8dp"
+            android:padding="5dp"
+            android:layout_marginBottom="5dp">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/new_sched_del"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:text="Delete"
+                app:cornerRadius="3dp"
+                android:backgroundTint="@color/gold"
+                android:textColor="@color/blue"
+                android:textAllCaps="false"
+                android:textSize="16sp"
+                android:fontFamily="@font/dm_sans_semibold"
+                android:visibility="invisible" />
+
+            <View
+                android:layout_width="16dp"
+                android:layout_height="48dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/new_sched_add"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:text="Add"
+                android:textColor="@color/gold"
+                android:backgroundTint="@color/blue"
+                android:textSize="16sp"
+                android:textAllCaps="false"
+                android:fontFamily="@font/dm_sans_semibold"
+                app:cornerRadius="3dp" />
+        </LinearLayout>
+
+
+
+    </LinearLayout>
+</LinearLayout>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="appbackround">#F5F5F5</color>
+
+    <color name="gold">#c7b57e</color>
+    <color name="transparent">#00000000</color>
+    <color name="blue">#003060</color>
+    <color name="button_normal">#C7B57E</color>
+    <color name="button_cooldown">#4F4832</color>
+    <color name="pink_main">#E91E63</color>
+    <color name="pink_accent">#F8BBD0</color>
+
+    <color name="purple_main">#9C27B0</color>
+    <color name="purple_accent">#CE93D8</color>
+
+    <color name="blue_main">#2196F3</color>
+    <color name="blue_accent">#BBDEFB</color>
+
+    <color name="yellow_main">#FFA000</color>
+    <color name="yellow_accent">#FFF176</color>
+
+    <color name="light_gray">#a6a6a6</color>
+    <color name="background_main">#f2f2f2</color>
+
+    <color name="red_main">#D32F2F</color>
+    <color name="red_accent">#FFCDD2</color>
+
+    <color name="green_main">#388E3C</color>
+    <color name="green_accent">#C8E6C9</color>
+
+    <color name="orange_main">#F57C00</color>
+    <color name="orange_accent">#FFE0B2</color>
+
+    <color name="kronii_main">#3949AB</color>
+    <color name="kronii_accent">#E8EAF6</color>
+
+    <color name="luna_main">#F8BBD0</color>
+    <color name="luna_accent">#F3E5F5</color>
+
+    <color name="vivi_main">#FF95CB</color>
+    <color name="vivi_accent">#FFE0F0</color>
+
+    <color name="towa_main">#8E44AD</color>
+    <color name="towa_accent">#A3FF8F</color>
+
+    <color name="aqua_main">#6EC6FF</color>
+    <color name="aqua_accent">#FFE1F0</color>
+
+    <color name="light_blue">#E3F2FD</color>
+</resources>

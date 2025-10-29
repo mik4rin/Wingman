@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animated-selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item>
+        <shape>
+            <gradient
+                android:startColor="#001F3F"
+                android:centerColor="#004080"
+                android:endColor="#0066CC"
+                android:angle="270" />
+        </shape>
+    </item>
+
+    <item>
+        <shape>
+            <gradient
+                android:startColor="#0066CC"
+                android:centerColor="#001F3F"
+                android:endColor="#004080"
+                android:angle="270" />
+        </shape>
+    </item>
+</animated-selector>

@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">Wingman</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="dummy"> </string>
+    <string name="spinner_prompt"><![CDATA[<string name=\"spinner_prompt\">Sort by</string>\n]]></string>
+    <string-array name="sort_options">
+        <item>Title Ascending</item>
+        <item>Title Descending</item>
+        <item>Due Date Ascending</item>
+        <item>Due Date Descending</item>
+    </string-array>
+
+
+
+</resources>

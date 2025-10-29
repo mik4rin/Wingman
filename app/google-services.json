@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "542823490719",
+    "project_id": "wingmanapp-1e9be",
+    "storage_bucket": "wingmanapp-1e9be.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:542823490719:android:9a85e6ed6ec74c29cdeeaa",
+        "android_client_info": {
+          "package_name": "com.example.wingman"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBF5FvMnWLqgy-D6FyWL3sUh8hw9dKFwDk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

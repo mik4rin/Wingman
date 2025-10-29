@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:maxHeight="500dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:background="@drawable/bgborder">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Terms and Conditions"
+            android:textSize="20sp"
+            android:fontFamily="@font/dm_sans_bold"
+            android:textColor="@color/blue"
+            android:gravity="center"
+            android:layout_marginBottom="16dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Please read and accept our terms and conditions to continue."
+            android:textSize="14sp"
+            android:fontFamily="@font/dm_sans_semibold"
+            android:textColor="@color/blue"
+            android:gravity="center"
+            android:layout_marginBottom="16dp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#E0E0E0"
+            android:layout_marginBottom="16dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Terms and Conditions"
+            android:textSize="16sp"
+            android:fontFamily="@font/dm_sans_bold"
+            android:textColor="@color/blue"
+            android:layout_marginBottom="12dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="1. Account Registration\n\nYou agree to provide accurate, current, and complete information during the registration process and to update such information to keep it accurate, current, and complete."
+            android:textSize="13sp"
+            android:fontFamily="dm_sans_semibold"
+            android:textColor="#666666"
+            android:lineSpacingExtra="4dp"
+            android:layout_marginBottom="12dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="2. User Responsibilities\n\nYou are responsible for maintaining the confidentiality of your account and password and for restricting access to your device."
+            android:textSize="13sp"
+            android:fontFamily="dm_sans_semibold"
+            android:textColor="#666666"
+            android:lineSpacingExtra="4dp"
+            android:layout_marginBottom="12dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="3. Privacy Policy\n\nWe respect your privacy and are committed to protecting your personal data. Your information will be used in accordance with our Privacy Policy."
+            android:textSize="13sp"
+            android:fontFamily="dm_sans_semibold"
+            android:textColor="#666666"
+            android:lineSpacingExtra="4dp"
+            android:layout_marginBottom="12dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="4. Acceptable Use\n\nYou agree not to use the service for any unlawful purpose or in any way that could damage, disable, or impair the service."
+            android:textSize="13sp"
+            android:fontFamily="dm_sans_semibold"
+            android:textColor="#666666"
+            android:lineSpacingExtra="4dp"
+            android:layout_marginBottom="12dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="5. Intellectual Property\n\nAll content provided through the service is protected by intellectual property laws and remains the property of Wingman."
+            android:textSize="13sp"
+            android:fontFamily="dm_sans_semibold"
+            android:textColor="#666666"
+            android:lineSpacingExtra="4dp"
+            android:layout_marginBottom="12dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="6. Termination\n\nWe reserve the right to terminate or suspend your account at any time for violation of these terms."
+            android:textSize="13sp"
+            android:fontFamily="dm_sans_semibold"
+            android:textColor="#666666"
+            android:lineSpacingExtra="4dp"
+            android:layout_marginBottom="16dp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#E0E0E0"
+            android:layout_marginBottom="16dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnDecline"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_weight="1"
+                android:backgroundTint="@color/gold"
+                android:fontFamily="@font/dm_sans_semibold"
+                android:text="Decline"
+                android:textAllCaps="false"
+                android:textColor="@color/blue"
+                android:textSize="16sp" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnAgree"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Agree &amp; Continue"
+                android:textAllCaps="false"
+                android:textColor="@color/gold"
+                android:textSize="16sp"
+                android:fontFamily="@font/dm_sans_bold"
+                android:backgroundTint="@color/blue"
+                android:layout_marginStart="8dp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>

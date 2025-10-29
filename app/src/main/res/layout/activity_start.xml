@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    android:id="@+id/main"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/umakbg" />
+
+    <LinearLayout
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="32dp"
+        android:orientation="vertical"
+        android:background="@drawable/border"
+        android:padding="24dp"
+        android:gravity="center"
+        android:elevation="4dp"
+        android:layout_centerInParent="true">
+
+        <ImageView
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:src="@drawable/logo_start"
+            android:layout_gravity="center_horizontal"
+            android:contentDescription="App Logo"
+            android:layout_marginBottom="8dp" />
+
+        <!-- Welcome Message Section -->
+        <TextView
+            android:id="@+id/welcomeTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Welcome to Wingman!"
+            android:textSize="22sp"
+            android:textColor="#003060"
+            android:fontFamily="@font/dm_sans_bold"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:maxLines="1"
+            android:ellipsize="none"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:id="@+id/welcomeSubtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Organize. Achieve. Excel."
+            android:textSize="16sp"
+            android:textColor="#666666"
+            android:fontFamily="@font/dm_sans_semibold"
+            android:gravity="center"
+            android:layout_marginBottom="24dp"
+            android:alpha="0.7" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/loginButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/button_ripple"
+            android:clickable="true"
+            android:elevation="4dp"
+            android:focusable="true"
+            android:fontFamily="@font/dm_sans_semibold"
+            android:padding="12dp"
+            android:text="Login"
+            android:textAllCaps="false"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/createAccountButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/button_ripple"
+            android:clickable="true"
+            android:elevation="4dp"
+            android:focusable="true"
+            android:fontFamily="@font/dm_sans_semibold"
+            android:padding="12dp"
+            android:text="Create Account"
+            android:textAllCaps="false"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+</RelativeLayout>

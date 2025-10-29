@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Mon–Fri Scheduler with Time Labels</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; }
+        html, body {
+            margin: 0; padding: 0;
+            height: 100%;
+            overflow: hidden;
+            user-select: none;
+            font-family: sans-serif;
+        }
+        #container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+        #schedule-grid {
+            display: grid;
+            grid-template-columns: 60px repeat(5, 1fr);
+            grid-template-rows: 40px repeat(24, 1fr);
+            width: 100%;
+            height: 100%;
+            position: relative;
+            z-index: 0;
+
+            /* new table outline and rounding */
+            border: 1px solid #000;
+            border-radius: 8px;
+            overflow: hidden;  /* clip cells to the rounded corners */
+        }
+        .cell {
+            border-right: 1px solid #ccc;
+        }
+        .header {
+            border-bottom: 1px solid #ccc;
+            background: #f0f0f0;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+        .slot {
+            background: #fff;
+        }
+        .time-label {
+            grid-column: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #555;
+        }
+
+        .schedule-block {
+            background-color: white;
+            border: 2px solid black;
+
+            border-radius: 4px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            font-size: 12px;
+            padding: 2px;
+            box-sizing: border-box;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .schedule-block:hover {
+            background-color: #eee;
+        }
+    </style>
+</head>
+
+<body>
+<div id="container">
+    <div id="schedule-grid">
+        <div class="cell header"></div>
+        <div class="cell header">Mon</div>
+        <div class="cell header">Tue</div>
+        <div class="cell header">Wed</div>
+        <div class="cell header">Thu</div>
+        <div class="cell header">Fri</div>
+    </div>
+</div>
+
+<script>
+    const grid = document.getElementById("schedule-grid");
+    const days = 5;
+    const totalRows = 24;
+
+    for (let hour = 0; hour < totalRows; hour++) {
+        const timeLabel = document.createElement("div");
+        timeLabel.className = "cell time-label";
+        timeLabel.textContent = `${hour.toString().padStart(2, '0')}:00`;
+        timeLabel.style.gridRow = hour + 2;
+        grid.appendChild(timeLabel);
+
+        for (let day = 0; day < days; day++) {
+            const slot = document.createElement("div");
+            slot.className = "cell slot";
+            slot.style.gridColumn = day + 2;
+            slot.style.gridRow = hour + 2;
+            grid.appendChild(slot);
+        }
+    }
+
+    function addScheduleBlock(dayIndex, startHour, startMinute, endHour, endMinute, title, borderColor, backgroundColor, alarmEnabled) {
+        const scheduleGrid = document.getElementById('schedule-grid');
+        const block = document.createElement('div');
+        block.classList.add('schedule-block');
+        block.innerText = title + (alarmEnabled ? " ⏰" : "");
+
+        const infoObj = {
+            title,
+            day: dayIndex,
+            startHour,
+            startMinute,
+            endHour,
+            endMinute,
+            borderColor,
+            backgroundColor,
+            alarmEnabled: alarmEnabled || false // 🟢 store alarmEnabled
+        };
+        block.setAttribute('data-info', JSON.stringify(infoObj));
+
+        block.style.border = `2px solid ${borderColor}`;
+        block.style.backgroundColor = backgroundColor;
+
+        block.style.gridColumnStart = dayIndex + 2;
+        block.style.gridRowStart = startHour + 2;
+        block.style.gridRowEnd = endHour + 2;
+
+        block.addEventListener('click', () => {
+            if (window.AndroidInterface && window.AndroidInterface.onBlockClicked) {
+                window.AndroidInterface.onBlockClicked(JSON.stringify(infoObj));
+            } else {
+                console.log('AndroidInterface not available');
+            }
+        });
+
+        scheduleGrid.appendChild(block);
+    }
+
+    function deleteBlock(title, day, startHour, startMinute, endHour, endMinute) {
+        const blocks = document.querySelectorAll('.schedule-block');
+        blocks.forEach(block => {
+            const data = JSON.parse(block.getAttribute('data-info'));
+            if (
+                data.title       === title &&
+                data.day         === day   &&
+                data.startHour   === startHour &&
+                data.startMinute === startMinute &&
+                data.endHour     === endHour &&
+                data.endMinute   === endMinute
+            ) {
+                block.remove();
+            }
+        });
+    }
+
+    function updateScheduleBlock(oldTitle, oldDay, oldStartHour, oldStartMinute,
+                                newDay, newStartHour, newStartMinute, newEndHour, newEndMinute,
+                                newTitle, newBorderColor, newBackgroundColor, newAlarmEnabled) {
+        const blocks = document.querySelectorAll('.schedule-block');
+        blocks.forEach(block => {
+            const data = JSON.parse(block.getAttribute('data-info'));
+            if (data.title === oldTitle && data.day === oldDay && data.startHour === oldStartHour && data.startMinute === oldStartMinute) {
+                const borderColor = newBorderColor || data.borderColor || "#000";
+                const backgroundColor = newBackgroundColor || data.backgroundColor || "#fff";
+                block.remove();
+                addScheduleBlock(newDay, newStartHour, newStartMinute, newEndHour, newEndMinute,
+                                 newTitle, borderColor, backgroundColor, newAlarmEnabled);
+            }
+        });
+    }
+</script>
+
+</body>
+</html>

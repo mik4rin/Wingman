@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/card_root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:layout_marginVertical="6dp"
+    android:background="@drawable/bgborder">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/tvNumber"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:fontFamily="@font/dm_sans_bold"
+            android:text="1"
+            android:textColor="@color/blue"
+            android:textSize="16sp" />
+
+        <ImageButton
+            android:id="@+id/ivReorder"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:layout_marginEnd="8dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Reorder"
+            android:src="@drawable/ic_reorder"
+            app:tint="@color/blue"/>
+
+        <ImageButton
+            android:id="@+id/ivDelete"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Delete"
+            android:src="@drawable/ic_delete"
+            app:tint="@color/blue" />
+
+    </LinearLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:hint="Question"
+        app:boxStrokeColor="@color/blue"
+        app:hintTextColor="@color/blue"
+        app:boxStrokeWidth="1dp"
+        app:boxStrokeWidthFocused="1dp">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etQuestion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/dm_sans_semibold"
+            android:padding="8dp"
+            android:singleLine="true"
+            android:textSize="16sp"
+            android:maxLines="1"
+            android:textColor="@color/blue"
+            android:textColorHint="@color/gold" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:hint="Answer"
+        app:boxStrokeColor="@color/blue"
+        app:hintTextColor="@color/blue"
+        app:boxStrokeWidth="1dp"
+        app:boxStrokeWidthFocused="1dp">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etAnswer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/dm_sans_semibold"
+            android:padding="8dp"
+            android:textColor="@color/blue"
+            android:textSize="16sp"
+            android:textColorHint="@color/gold"
+            android:inputType="textMultiLine"
+            android:minLines="2"
+            android:gravity="top|start" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+</LinearLayout>

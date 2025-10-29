@@ -1,0 +1,53 @@
+<resources>
+
+    <style name="ModeSelectorButton">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:background">@drawable/mode_button_default</item>
+        <item name="android:textColor">@color/blue</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:fontFamily">@font/theseasons_bold</item>
+        <item name="android:layout_margin">4dp</item>
+        <item name="android:clickable">true</item>
+        <item name="android:foreground">?attr/selectableItemBackground</item>
+    </style>
+    <style name="SchedulerDialog" parent="Theme.MaterialComponents.Light.Dialog">
+        <item name="android:windowMinWidthMajor">90%</item>
+        <item name="android:windowMinWidthMinor">90%</item>
+
+    </style>
+
+    <style name="NoTintCheckboxTheme" parent="ThemeOverlay.AppCompat.Light">
+        <item name="colorControlActivated">@null</item>
+        <item name="colorControlHighlight">@null</item>
+        <item name="colorButtonNormal">@null</item>
+    </style>
+
+
+    <style name="PrimaryButton">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:backgroundTint">@color/blue</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:fontFamily">@font/theseasons_bold</item>
+        <item name="android:layout_margin">4dp</item>
+    </style>
+
+    <style name="SecondaryButton" parent="PrimaryButton">
+        <item name="android:backgroundTint">@color/gold</item>
+    </style>
+
+    <style name="NumberPickerStyle">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">@color/blue</item>
+        <item name="android:colorControlNormal">@color/blue</item>
+        <item name="android:colorAccent">@color/blue</item>
+    </style>
+
+    <style name="CircularFAB" parent="Widget.Material3.FloatingActionButton.Primary">
+        <item name="shapeAppearance">@style/ShapeAppearance.Material3.Corner.Full</item>
+    </style>
+
+</resources>

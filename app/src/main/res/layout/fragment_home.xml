@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/appbackround">
+
+    <ScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@color/appbackround"
+            android:padding="14dp">
+
+            <TextView
+                android:id="@+id/current_time"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="10:29"
+                android:textColor="@color/blue"
+                android:textSize="72sp"
+                android:fontFamily="@font/dm_sans_bold"
+                android:letterSpacing="-0.02"
+                android:layout_marginBottom="8dp"
+                android:gravity="center" />
+
+            <TextView
+                android:id="@+id/current_date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Today, May 4, 2025"
+                android:textColor="@color/blue"
+                android:textSize="16sp"
+                android:fontFamily="@font/dm_sans_semibold"
+                android:layout_marginBottom="24dp"
+                android:alpha="0.8"
+                android:gravity="center" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="6dp"
+                app:cardBackgroundColor="@color/blue">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="20dp"
+                    android:gravity="center_vertical">
+
+                    <de.hdodenhof.circleimageview.CircleImageView
+                        android:id="@+id/profile_image"
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        android:src="@drawable/default_profile_picture"
+                        app:civ_border_color="@color/gold"
+                        app:civ_border_width="2dp" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_marginStart="20dp">
+
+                        <TextView
+                            android:id="@+id/greeting_text"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Hi User"
+                            android:textColor="@color/white"
+                            android:textSize="22sp"
+                            android:fontFamily="@font/dm_sans_bold" />
+
+                        <TextView
+                            android:id="@+id/motivational_text"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Have a productive day!"
+                            android:textColor="@color/white"
+                            android:textSize="14sp"
+                            android:fontFamily="@font/dm_sans_semibold"
+                            android:layout_marginTop="4dp"
+                            android:alpha="0.85" />
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
+                app:cardBackgroundColor="@color/white">
+
+                <CalendarView
+                    android:id="@+id/calendarView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="8dp" />
+            </com.google.android.material.card.MaterialCardView>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="8dp"
+                android:gravity="start|center_vertical">
+
+                <TextView
+                    android:id="@+id/headerTitle3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Priority Tasks"
+                    android:textSize="16sp"
+                    android:textColor="@color/blue"
+                    android:fontFamily="@font/dm_sans_bold" />
+
+                <Spinner
+                    android:id="@+id/spinnerSort2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="16dp"
+                    android:popupBackground="@drawable/notification_dropdown_background"
+                    />
+            </LinearLayout>
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp"
+                android:maxHeight="350dp"
+                app:cardBackgroundColor="@color/blue">
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp">
+
+                    <ListView
+                        android:id="@+id/listViewItems"
+                        android:layout_width="match_parent"
+                        android:layout_height="350dp"
+                        android:divider="@android:color/transparent"
+                        android:dividerHeight="8dp"
+                        android:nestedScrollingEnabled="true"
+                        android:padding="8dp"
+                        android:fontFamily="@font/dm_sans_semibold" />
+
+                    <TextView
+                        android:id="@+id/emptyTasksPlaceholder"
+                        android:layout_width="match_parent"
+                        android:layout_height="350dp"
+                        android:text="You have no tasks yet"
+                        android:textSize="14sp"
+                        android:textColor="@color/white"
+                        android:fontFamily="@font/dm_sans_semibold"
+                        android:gravity="center"
+                        android:visibility="gone"
+                        android:alpha="0.7" />
+                </FrameLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="8dp"
+                android:gravity="start|center_vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Upcoming Schedules"
+                    android:textSize="16sp"
+                    android:textColor="@color/blue"
+                    android:fontFamily="@font/dm_sans_bold" />
+
+                <Spinner
+                    android:id="@+id/upcoming_sched_sort_spinner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp" />
+            </LinearLayout>
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp"
+                android:maxHeight="350dp"
+                app:cardBackgroundColor="@color/blue">
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <ListView
+                        android:id="@+id/upcoming_sched_lv"
+                        android:layout_width="match_parent"
+                        android:layout_height="350dp"
+                        android:divider="@android:color/transparent"
+                        android:dividerHeight="8dp"
+                        android:nestedScrollingEnabled="true"
+                        android:padding="8dp"
+                        android:fontFamily="@font/dm_sans_semibold" />
+
+                    <TextView
+                        android:id="@+id/emptySchedulesPlaceholder"
+                        android:layout_width="match_parent"
+                        android:layout_height="350dp"
+                        android:text="You have no upcoming schedules"
+                        android:textSize="14sp"
+                        android:textColor="@color/white"
+                        android:fontFamily="@font/dm_sans_semibold"
+                        android:gravity="center"
+                        android:visibility="gone"
+                        android:alpha="0.7" />
+                </FrameLayout>
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
+    </ScrollView>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabHome"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="30dp"
+        android:layout_marginBottom="16dp"
+        android:contentDescription="Add"
+        app:fabSize="normal"
+        app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:backgroundTint="@color/gold"
+        app:srcCompat="@drawable/fab_add_icon"
+        app:tint="@android:color/white" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnNewNote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="8dp"
+        android:capitalize="words"
+        android:fontFamily="@font/dm_sans_semibold"
+        android:text="New Note"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:visibility="gone"
+        android:background="@drawable/rounded_button"
+        app:layout_constraintBottom_toTopOf="@id/fabHome"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnNewSchedule"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="8dp"
+        android:capitalize="words"
+        android:fontFamily="@font/dm_sans_semibold"
+        android:text="New Schedule"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:visibility="gone"
+        android:background="@drawable/rounded_button"
+        app:layout_constraintBottom_toTopOf="@id/btnNewNote"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnNewTask"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="8dp"
+        android:capitalize="words"
+        android:fontFamily="@font/dm_sans_semibold"
+        android:text="New Task"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:visibility="gone"
+        android:background="@drawable/rounded_button"
+        app:layout_constraintBottom_toTopOf="@id/btnNewSchedule"
+        app:layout_constraintEnd_toEndOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>
