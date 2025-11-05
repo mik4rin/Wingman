@@ -33,6 +33,18 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
+        <ImageButton
+            android:id="@+id/shareNote_btn"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginEnd="8dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:scaleType="fitCenter"
+            android:contentDescription="Share Note"
+            app:srcCompat="@drawable/share_icon"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/exportNote_btn" />
+
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/note_title"
             android:layout_width="0dp"
@@ -46,14 +58,14 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@id/exportNote_btn"
             app:layout_constraintBottom_toBottomOf="@id/exportNote_btn"
-            app:layout_constraintEnd_toStartOf="@id/exportNote_btn"/>
+            app:layout_constraintEnd_toStartOf="@id/shareNote_btn"/>
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/note_content"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:minHeight="90dp"
-            android:paddingTop="4dp"
+            android:paddingTop="8dp"
             android:text="Content of the note goes here, potentially spanning multiple lines. This is a longer piece of text to demonstrate the layout."
             android:textColor="@color/black"
             android:textSize="13sp"

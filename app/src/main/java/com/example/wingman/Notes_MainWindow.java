@@ -24,6 +24,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -32,6 +33,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.wingman.data.Note;
+import com.example.wingman.data.OnFirestoreResultListener;
 import com.example.wingman.databinding.NotesMainFragmentAllNotesBinding;
 
 import java.io.File;
@@ -48,23 +50,31 @@ import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.text.Spanned;
 
-public class Notes_MainWindow extends Fragment {
+public class Notes_MainWindow extends Fragment implements ShareNoteDialog.ShareNoteListener {
     private static final String TAG = "Notes_MainWindow";
     private NotesMainFragmentAllNotesBinding binding;
     private NotesAdapter notesAdapter;
     private PinnedNotesAdapter pinnedNotesAdapter;
+    private NotesAdapter sharedNotesAdapter;
+
     private Handler autoScrollHandler;
     private Runnable autoScrollRunnable;
     private int pinnedScrollPosition = 0;
+
     private boolean contextMenuFromPinned = false;
+    private boolean contextMenuFromShared = false;
     private int selectedNotePosition = RecyclerView.NO_POSITION;
     private int pinnedSelectedPosition = RecyclerView.NO_POSITION;
+    private int sharedSelectedPosition = RecyclerView.NO_POSITION;
+
     private NotesViewModel notesViewModel;
 
     private String currentSortBy = "title";
     private boolean currentAscending = true;
+
     private final List<Note> latestPinnedNotes = new ArrayList<>();
     private final List<Note> latestUnpinnedNotes = new ArrayList<>();
+    private final List<Note> latestSharedNotes = new ArrayList<>();
 
     public Notes_MainWindow() { }
 
@@ -109,9 +119,27 @@ public class Notes_MainWindow extends Fragment {
 
             pinnedNotesAdapter.submitList(list);
             boolean hasPinned = !list.isEmpty();
-            binding.pinnedSectionLabel.setVisibility(hasPinned ? View.VISIBLE : View.GONE);
-            binding.mainNotePinnedNotes.setVisibility(hasPinned ? View.VISIBLE : View.GONE);
+            if (binding != null) {
+                binding.pinnedSectionLabel.setVisibility(hasPinned ? View.VISIBLE : View.GONE);
+                binding.mainNotePinnedNotes.setVisibility(hasPinned ? View.VISIBLE : View.GONE);
+            }
+            updateNotesEmptyPlaceholder();
+        });
 
+        notesViewModel.getSharedNotesLive().observe(getViewLifecycleOwner(), shared -> {
+            List<Note> list = shared != null ? new ArrayList<>(shared) : new ArrayList<>();
+            latestSharedNotes.clear();
+            latestSharedNotes.addAll(list);
+
+            if (sharedNotesAdapter != null) {
+                sharedNotesAdapter.submitList(list);
+            }
+
+            boolean hasShared = !list.isEmpty();
+            if (binding != null && binding.sharedSectionLabel != null && binding.mainNoteSharedNotes != null) {
+                binding.sharedSectionLabel.setVisibility(hasShared ? View.VISIBLE : View.GONE);
+                binding.mainNoteSharedNotes.setVisibility(hasShared ? View.VISIBLE : View.GONE);
+            }
             updateNotesEmptyPlaceholder();
         });
 
@@ -132,7 +160,8 @@ public class Notes_MainWindow extends Fragment {
 
         int unpinnedCount = latestUnpinnedNotes.size();
         int pinnedCount = latestPinnedNotes.size();
-        int totalMatching = unpinnedCount + pinnedCount;
+        int sharedCount = latestSharedNotes.size();
+        int totalMatching = unpinnedCount + pinnedCount + sharedCount;
 
         String query = "";
         if (binding.searchEditText != null && binding.searchEditText.getText() != null) {
@@ -156,18 +185,33 @@ public class Notes_MainWindow extends Fragment {
         NotesAdapter.OnExportClickListener exportClickListener = this::exportNoteToPdf;
         PinnedNotesAdapter.OnExportClickListener pinnedExportClickListener = this::exportNoteToPdf;
 
-        notesAdapter = new NotesAdapter(note -> openEditorFor(note.getId()), exportClickListener);
+        NotesAdapter.OnShareClickListener shareClickListener = this::openShareDialog;
+        PinnedNotesAdapter.OnShareClickListener pinnedShareClickListener = this::openShareDialog;
+
+        notesAdapter = new NotesAdapter(note -> openEditorFor(note.getId()), exportClickListener, shareClickListener);
         notesAdapter.setContextMenuCallback((position, fromPinned) -> {
             selectedNotePosition = position;
             contextMenuFromPinned = false;
+            contextMenuFromShared = false;
             requireActivity().openContextMenu(binding.mainNoteAllNotes);
         });
 
-        pinnedNotesAdapter = new PinnedNotesAdapter(note -> openEditorFor(note.getId()), pinnedExportClickListener);
+        pinnedNotesAdapter = new PinnedNotesAdapter(note -> openEditorFor(note.getId()), pinnedExportClickListener, pinnedShareClickListener);
         pinnedNotesAdapter.setContextMenuCallback((position, fromPinned) -> {
             pinnedSelectedPosition = position;
             contextMenuFromPinned = true;
+            contextMenuFromShared = false;
             requireActivity().openContextMenu(binding.mainNotePinnedNotes);
+        });
+
+        sharedNotesAdapter = new NotesAdapter(note -> openEditorFor(note.getId()), exportClickListener, shareClickListener);
+        sharedNotesAdapter.setContextMenuCallback((position, fromPinned) -> {
+            sharedSelectedPosition = position;
+            contextMenuFromPinned = false;
+            contextMenuFromShared = true;
+            if (binding != null && binding.mainNoteSharedNotes != null) {
+                requireActivity().openContextMenu(binding.mainNoteSharedNotes);
+            }
         });
     }
 
@@ -179,8 +223,16 @@ public class Notes_MainWindow extends Fragment {
                 new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         binding.mainNotePinnedNotes.setAdapter(pinnedNotesAdapter);
 
+        if (binding != null && binding.mainNoteSharedNotes != null) {
+            binding.mainNoteSharedNotes.setLayoutManager(new GridLayoutManager(getContext(), 2));
+            binding.mainNoteSharedNotes.setAdapter(sharedNotesAdapter);
+        }
+
         requireActivity().registerForContextMenu(binding.mainNoteAllNotes);
         requireActivity().registerForContextMenu(binding.mainNotePinnedNotes);
+        if (binding != null && binding.mainNoteSharedNotes != null) {
+            requireActivity().registerForContextMenu(binding.mainNoteSharedNotes);
+        }
     }
 
     private void setupSearch() {
@@ -282,33 +334,104 @@ public class Notes_MainWindow extends Fragment {
                                     @NonNull View v,
                                     @Nullable android.view.ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
+
+        final int pos = contextMenuFromPinned ? pinnedSelectedPosition : (contextMenuFromShared ? sharedSelectedPosition : selectedNotePosition);
+        if (pos == RecyclerView.NO_POSITION) return;
+
+        Note selectedNote = null;
+        try {
+            if (contextMenuFromPinned) {
+                selectedNote = pinnedNotesAdapter.getCurrentList().get(pos);
+            } else if (contextMenuFromShared) {
+                selectedNote = sharedNotesAdapter.getCurrentList().get(pos);
+            } else {
+                selectedNote = notesAdapter.getCurrentList().get(pos);
+            }
+        } catch (IndexOutOfBoundsException e) {
+            Log.e(TAG, "Error getting selected note for context menu", e);
+            return;
+        }
+
+        if (selectedNote == null) return;
+
         requireActivity().getMenuInflater().inflate(R.menu.notes_context_menu, menu);
+
+        String currentUserId = getCurrentUserUid();
+        boolean isOwner = currentUserId != null && currentUserId.equals(selectedNote.getUserId());
+        boolean isSharedNote = selectedNote.getSharedWith() != null && !selectedNote.getSharedWith().isEmpty();
+        boolean isPinned = selectedNote.isPinned();
+
+        if (!isOwner) {
+            menu.findItem(R.id.action_pin).setVisible(false);
+            menu.findItem(R.id.action_unpin).setVisible(false);
+        }
+        else {
+            if (isSharedNote) {
+                menu.findItem(R.id.action_pin).setVisible(false);
+                menu.findItem(R.id.action_unpin).setVisible(false);
+            } else {
+                menu.findItem(R.id.action_pin).setVisible(!isPinned);
+                menu.findItem(R.id.action_unpin).setVisible(isPinned);
+            }
+        }
     }
 
     @Override
     public boolean onContextItemSelected(@NonNull android.view.MenuItem item) {
         final boolean fromPinned = contextMenuFromPinned;
-        final int pos = fromPinned ? pinnedSelectedPosition : selectedNotePosition;
+        final boolean fromShared = contextMenuFromShared;
+
+        final int pos = fromPinned ? pinnedSelectedPosition : (fromShared ? sharedSelectedPosition : selectedNotePosition);
 
         if (pos == RecyclerView.NO_POSITION) return super.onContextItemSelected(item);
 
         try {
-            Note selectedNote = fromPinned
-                    ? pinnedNotesAdapter.getCurrentList().get(pos)
-                    : notesAdapter.getCurrentList().get(pos);
+            Note selectedNote;
+            if (fromPinned) {
+                selectedNote = pinnedNotesAdapter.getCurrentList().get(pos);
+            } else if (fromShared) {
+                selectedNote = sharedNotesAdapter.getCurrentList().get(pos);
+            } else {
+                selectedNote = notesAdapter.getCurrentList().get(pos);
+            }
 
             handleContextMenuAction(item.getItemId(), selectedNote);
         } finally {
             selectedNotePosition = RecyclerView.NO_POSITION;
             pinnedSelectedPosition = RecyclerView.NO_POSITION;
+            sharedSelectedPosition = RecyclerView.NO_POSITION;
+            contextMenuFromPinned = false;
+            contextMenuFromShared = false;
         }
         return true;
     }
 
     private void handleContextMenuAction(int actionId, Note selectedNote) {
         String noteId = selectedNote.getId();
+        String currentUserId = getCurrentUserUid();
+
+        if (currentUserId == null) {
+            Toast.makeText(requireContext(), "User session error.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        boolean isOwner = currentUserId.equals(selectedNote.getUserId());
+        boolean isSharedNote = selectedNote.getSharedWith() != null && !selectedNote.getSharedWith().isEmpty();
+
+        if (!isOwner) {
+            if (actionId == R.id.action_share || actionId == R.id.action_delete ||
+                    actionId == R.id.action_pin || actionId == R.id.action_unpin) {
+                Toast.makeText(requireContext(), "Permission denied: You cannot perform this action on a note owned by someone else.", Toast.LENGTH_LONG).show();
+                return;
+            }
+        }
+
+        if (isSharedNote && (actionId == R.id.action_pin || actionId == R.id.action_unpin)) {
+            Toast.makeText(requireContext(), "Shared notes cannot be pinned or unpinned.", Toast.LENGTH_LONG).show();
+            return;
+        }
+
         if (actionId == R.id.action_export) {
-            // Export to PDF
             exportNoteToPdf(selectedNote);
         } else if (actionId == R.id.action_delete) {
             confirmDelete(noteId);
@@ -320,7 +443,54 @@ public class Notes_MainWindow extends Fragment {
             if (selectedNote.isPinned()) {
                 unpinNoteById(noteId);
             }
+        } else if (actionId == R.id.action_share) {
+            openShareDialog(selectedNote);
         }
+    }
+
+    private void openShareDialog(Note note) {
+        Log.d(TAG, "Opening custom ShareNoteDialog for note: " + note.getTitle());
+
+        ShareNoteDialog dialog = ShareNoteDialog.newInstance(note);
+
+        dialog.setTargetFragment(this, 0);
+
+        dialog.show(getParentFragmentManager(), "ShareNoteDialogTag");
+    }
+
+    @Override
+    public void onSharedUsersUpdated(String noteId, List<String> newSharedUserIds) {
+        Log.d(TAG, "Share dialog confirmed. Updating shared users for note ID: " + noteId);
+        executeNoteShareUpdate(noteId, newSharedUserIds);
+    }
+
+    private void executeNoteShareUpdate(String noteId, List<String> userIdsToShareWith) {
+        if (notesViewModel == null || getContext() == null) return;
+
+        notesViewModel.updateNoteSharedWith(noteId, userIdsToShareWith, new OnFirestoreResultListener() {
+            @Override
+            public void onSuccess(String id) {
+                if (getActivity() != null) {
+                    getActivity().runOnUiThread(() -> {
+                        Toast.makeText(requireContext(),
+                                "Note sharing updated successfully!",
+                                Toast.LENGTH_SHORT).show();
+                    });
+                }
+            }
+
+            @Override
+            public void onError(Exception e) {
+                Log.e(TAG, "Failed to update note sharing", e);
+                if (getActivity() != null) {
+                    getActivity().runOnUiThread(() -> {
+                        Toast.makeText(requireContext(),
+                                "Error updating note sharing: " + e.getMessage(),
+                                Toast.LENGTH_LONG).show();
+                    });
+                }
+            }
+        });
     }
 
     private void confirmDelete(String noteId) {
@@ -383,11 +553,8 @@ public class Notes_MainWindow extends Fragment {
                         Layout.Alignment.ALIGN_NORMAL, 1.2f, 0f, true);
             }
 
-            // 5. Draw content page by page
             int textHeight = layout.getHeight();
-            // Calculate available height for page 1 (which has a header)
             int contentHeightOnFirstPage = pageHeight - y - margin;
-            // Calculate available height for subsequent pages (full page)
             int contentHeightOnSubsequentPages = pageHeight - 2 * margin;
 
             int startOffsetVertical = 0;
@@ -397,76 +564,58 @@ public class Notes_MainWindow extends Fragment {
                 int currentContentHeight;
 
                 if (pageNumber > 1) {
-                    // --- Setup new page ---
                     document.finishPage(page);
                     pageInfo = new PdfDocument.PageInfo.Builder(pageWidth, pageHeight, pageNumber).create();
                     page = document.startPage(pageInfo);
                     canvas = page.getCanvas();
-                    canvas.drawColor(android.graphics.Color.WHITE); // Clear new page
-                    y = margin; // Reset Y position to top margin
+                    canvas.drawColor(android.graphics.Color.WHITE);
+                    y = margin;
                     currentContentHeight = contentHeightOnSubsequentPages;
                 } else {
-                    // --- Use first page ---
                     currentContentHeight = contentHeightOnFirstPage;
                 }
 
-                // --- Calculate drawing bounds ---
                 int endOffsetVertical;
 
-                // Check if the rest of the text fits on this page
                 if (startOffsetVertical + currentContentHeight >= textHeight) {
-                    // We are on the last page. Set the bottom to the total text height.
                     endOffsetVertical = textHeight;
                 } else {
-                    // We are not on the last page. Find the line at the bottom of the page.
                     int endLine = layout.getLineForVertical(startOffsetVertical + currentContentHeight);
                     endOffsetVertical = layout.getLineTop(endLine);
 
-                    // Check for a single line taller than the page (infinite loop)
                     if (endOffsetVertical == startOffsetVertical) {
-                        // The line is too tall. Force clip at the bottom of the page.
                         endOffsetVertical = startOffsetVertical + currentContentHeight;
                     }
                 }
 
-                // --- Draw the clipped content ---
                 canvas.save();
                 canvas.translate(margin, y - startOffsetVertical);
                 canvas.clipRect(0, startOffsetVertical, contentWidth, endOffsetVertical);
                 layout.draw(canvas);
                 canvas.restore();
 
-                // Update offset for the next page
                 startOffsetVertical = endOffsetVertical;
                 pageNumber++;
             }
 
-            // Finalize the last page
             document.finishPage(page);
-            // 6. Save the PDF file
             String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
             String safeTitle = noteTitle.replaceAll("[^a-zA-Z0-9.-]", "_");
             String filename = safeTitle + "_" + timestamp + ".pdf";
 
-            // Use applicationContext.getExternalFilesDir for file location
             File file = new File(applicationContext.getExternalFilesDir(null), filename);
 
             try (FileOutputStream fos = new FileOutputStream(file)) {
                 document.writeTo(fos);
 
-                // --- END OF HEAVY WORK ---
-
-                // Switch back to the Main Thread to update the UI
                 if (getActivity() != null) {
                     getActivity().runOnUiThread(() -> {
                         Toast.makeText(applicationContext, "Note exported successfully!", Toast.LENGTH_SHORT).show();
-                        // Call openPdf on the Main Thread
                         openPdf(file);
                     });
                 }
             } catch (IOException e) {
                 Log.e(TAG, "Error generating PDF: " + e.getMessage());
-                // Switch back to the Main Thread for error Toast
                 if (getActivity() != null) {
                     getActivity().runOnUiThread(() -> {
                         Toast.makeText(applicationContext, "Error exporting note.", Toast.LENGTH_LONG).show();
@@ -476,7 +625,7 @@ public class Notes_MainWindow extends Fragment {
                 document.close();
             }
 
-        }).start(); // Start the background thread
+        }).start();
     }
 
     private void openPdf(File file) {
@@ -502,5 +651,10 @@ public class Notes_MainWindow extends Fragment {
         } catch (android.content.ActivityNotFoundException e) {
             Toast.makeText(getContext(), "No app found to view PDF.", Toast.LENGTH_LONG).show();
         }
+    }
+
+    private String getCurrentUserUid() {
+        if (notesViewModel == null) return null;
+        return notesViewModel.getCurrentUserUid();
     }
 }

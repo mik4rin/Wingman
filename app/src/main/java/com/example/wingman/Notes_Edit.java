@@ -67,7 +67,7 @@ public class Notes_Edit extends Fragment {
     private String originalContent = "";
     private String originalMainColor = "#FFFFFF";
     private String originalAccentColor = "#000000";
-
+    private Note currentNote = null;
     private boolean isSaving = false;
     private boolean hasUnsavedChanges = false;
     private boolean saveAndExitInProgress = false;
@@ -387,8 +387,17 @@ public class Notes_Edit extends Fragment {
             note.setPinned(false);
 
             if (noteId != null && !noteId.isEmpty()) {
-                note.setId(noteId);
-                notesViewModel.updateNote(note);
+                if (currentNote == null) {
+                    Toast.makeText(getContext(), "Error: Note data missing. Cannot update.", Toast.LENGTH_SHORT).show();
+                    isSaving = false;
+                    return;
+                }
+
+                currentNote.setTitle(title);
+                currentNote.setContents(finalCleaned);
+                currentNote.setMainColor(mainColor);
+                currentNote.setAccentColor(accentColor);
+                notesViewModel.updateNote(currentNote);
 
                 originalTitle = title;
                 originalContent = finalCleaned;
@@ -398,12 +407,23 @@ public class Notes_Edit extends Fragment {
                     Toast.makeText(getContext(), title + " updated successfully!", Toast.LENGTH_SHORT).show();
                     finishSave();
                 });
-            } else {
-                notesViewModel.insertNote(note);
 
-                String tempId = note.getId() != null ? note.getId() : ("temp_" + System.currentTimeMillis());
-                note.setId(tempId);
-                viewModel.setCurrentNoteId(tempId);
+            } else {
+                Note newNote = new Note();
+
+                newNote.setUserId(fu.getUid());
+                newNote.setTitle(title);
+                newNote.setContents(finalCleaned);
+                newNote.setMainColor(mainColor);
+                newNote.setAccentColor(accentColor);
+                newNote.setPinned(false);
+
+                notesViewModel.insertNote(newNote);
+
+                currentNote = newNote;
+                noteId = newNote.getId() != null ? newNote.getId() : ("temp_" + System.currentTimeMillis());
+                newNote.setId(noteId);
+                viewModel.setCurrentNoteId(noteId);
 
                 originalTitle = title;
                 originalContent = finalCleaned;
@@ -433,6 +453,7 @@ public class Notes_Edit extends Fragment {
                 @Override
                 public void onNoteLoaded(Note note) {
                     if (note == null) return;
+                    currentNote = note;
                     originalTitle = note.getTitle() != null ? note.getTitle() : "";
                     originalContent = note.getContents() != null ? note.getContents() : "";
 

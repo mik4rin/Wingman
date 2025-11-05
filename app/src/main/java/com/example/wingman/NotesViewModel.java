@@ -22,19 +22,15 @@ import java.util.concurrent.Executors;
 
 public class NotesViewModel extends AndroidViewModel {
     private static final String TAG = "NotesViewModel";
-
     private final NoteRepository noteRepo;
-
-    // LiveData exposed to UI
     private final MutableLiveData<List<Note>> unpinnedNotesLive = new MutableLiveData<>(new ArrayList<>());
     private final MutableLiveData<List<Note>> pinnedNotesLive = new MutableLiveData<>(new ArrayList<>());
-
-    // repository listener registration (single listener)
+    private final MutableLiveData<List<Note>> sharedNotesLive = new MutableLiveData<>(new ArrayList<>());
     private ListenerRegistration notesListenerReg;
-
-    // cache + sort/filter state
+    private ListenerRegistration sharedNotesListenerReg;
     private final List<Note> cachedAllNotes = new ArrayList<>();
-    private String currentSortBy = "date"; // "date" or "title"
+    private final List<Note> cachedSharedNotes = new ArrayList<>();
+    private String currentSortBy = "date";
     private boolean currentAscending = false;
     private String currentFilterQuery = "";
 
@@ -44,7 +40,6 @@ public class NotesViewModel extends AndroidViewModel {
         startListening();
     }
 
-    // ---------- LiveData getters ----------
     public LiveData<List<Note>> getUnpinnedNotesLive() {
         return unpinnedNotesLive;
     }
@@ -53,9 +48,16 @@ public class NotesViewModel extends AndroidViewModel {
         return pinnedNotesLive;
     }
 
-    // ---------- Real-time listener ----------
+    public LiveData<List<Note>> getSharedNotesLive() {
+        return sharedNotesLive;
+    }
+
+    public String getCurrentUserUid() {
+        return noteRepo.resolveCurrentUserId();
+    }
+
     private synchronized void startListening() {
-        if (notesListenerReg != null) return;
+        if (notesListenerReg != null || sharedNotesListenerReg != null) return;
 
         notesListenerReg = noteRepo.listenToNotes(new OnFirestoreNotesListener() {
             @Override
@@ -69,7 +71,23 @@ public class NotesViewModel extends AndroidViewModel {
 
             @Override
             public void onError(Exception e) {
-                Log.e(TAG, "notesListener error", e);
+                Log.e(TAG, "notesListener (own) error", e);
+            }
+        });
+
+        sharedNotesListenerReg = noteRepo.listenToSharedNotes(new OnFirestoreNotesListener() {
+            @Override
+            public void onSuccess(List<Note> notes) {
+                synchronized (cachedSharedNotes) {
+                    cachedSharedNotes.clear();
+                    if (notes != null) cachedSharedNotes.addAll(notes);
+                }
+                applySortAndFilterAndPost();
+            }
+
+            @Override
+            public void onError(Exception e) {
+                Log.e(TAG, "notesListener (shared) error", e);
             }
         });
     }
@@ -79,6 +97,10 @@ public class NotesViewModel extends AndroidViewModel {
             notesListenerReg.remove();
             notesListenerReg = null;
         }
+        if (sharedNotesListenerReg != null) {
+            sharedNotesListenerReg.remove();
+            sharedNotesListenerReg = null;
+        }
     }
 
     @Override
@@ -87,7 +109,6 @@ public class NotesViewModel extends AndroidViewModel {
         stopListening();
     }
 
-    // ---------- Sorting & filtering ----------
     public void setSort(String sortBy, boolean ascending) {
         this.currentSortBy = (sortBy == null) ? "date" : sortBy;
         this.currentAscending = ascending;
@@ -99,38 +120,72 @@ public class NotesViewModel extends AndroidViewModel {
         applySortAndFilterAndPost();
     }
 
+    // Inside NotesViewModel.java
+
     private void applySortAndFilterAndPost() {
         Executors.newSingleThreadExecutor().execute(() -> {
-            List<Note> copy;
+            List<Note> ownNotesCopy;
+            List<Note> sharedNotesCopy;
+
             synchronized (cachedAllNotes) {
-                copy = new ArrayList<>(cachedAllNotes);
+                ownNotesCopy = new ArrayList<>(cachedAllNotes);
+            }
+            synchronized (cachedSharedNotes) {
+                sharedNotesCopy = new ArrayList<>(cachedSharedNotes);
             }
 
-            List<Note> unpinned = new ArrayList<>();
-            List<Note> pinned = new ArrayList<>();
+            List<Note> finalUnpinned = new ArrayList<>();
+            List<Note> finalPinned = new ArrayList<>();
+            List<Note> finalShared = new ArrayList<>();
 
-            for (Note n : copy) {
+            java.util.Set<String> sharedNoteIds = new java.util.HashSet<>();
+
+            for (Note n : sharedNotesCopy) {
                 if (n == null) continue;
                 boolean matches = currentFilterQuery.isEmpty() ||
                         safeString(n.getTitle()).toLowerCase().contains(currentFilterQuery) ||
                         safeString(n.getContents()).toLowerCase().contains(currentFilterQuery);
                 if (!matches) continue;
 
-                if (n.isPinned()) pinned.add(n);
-                else unpinned.add(n);
+                finalShared.add(n);
+                sharedNoteIds.add(n.getId());
+            }
+
+            for (Note n : ownNotesCopy) {
+                if (n == null) continue;
+
+                if (sharedNoteIds.contains(n.getId())) continue;
+
+                boolean matches = currentFilterQuery.isEmpty() ||
+                        safeString(n.getTitle()).toLowerCase().contains(currentFilterQuery) ||
+                        safeString(n.getContents()).toLowerCase().contains(currentFilterQuery);
+                if (!matches) continue;
+
+                if (n.getSharedWith() != null && !n.getSharedWith().isEmpty()) {
+                    finalShared.add(n);
+                }
+                else if (n.isPinned()) {
+                    finalPinned.add(n);
+                } else {
+                    finalUnpinned.add(n);
+                }
             }
 
             Comparator<Note> comparator = "title".equalsIgnoreCase(currentSortBy)
                     ? (a, b) -> safeString(a.getTitle()).compareToIgnoreCase(safeString(b.getTitle()))
                     : (a, b) -> Long.compare(a.getTimestamp(), b.getTimestamp());
 
-            if (!currentAscending) comparator = comparator.reversed();
+            if (!currentAscending) {
+                comparator = comparator.reversed();
+            }
 
-            Collections.sort(unpinned, comparator);
-            Collections.sort(pinned, comparator);
+            Collections.sort(finalUnpinned, comparator);
+            Collections.sort(finalPinned, comparator);
+            Collections.sort(finalShared, comparator);
 
-            unpinnedNotesLive.postValue(new ArrayList<>(unpinned));
-            pinnedNotesLive.postValue(new ArrayList<>(pinned));
+            unpinnedNotesLive.postValue(finalUnpinned);
+            pinnedNotesLive.postValue(finalPinned);
+            sharedNotesLive.postValue(finalShared);
         });
     }
 
@@ -138,7 +193,12 @@ public class NotesViewModel extends AndroidViewModel {
         return s == null ? "" : s;
     }
 
-    // ---------- CRUD operations (auto-update cache) ----------
+    public void updateNoteSharedWith(String noteId, List<String> userIdsToShareWith, OnFirestoreResultListener listener) {
+        Executors.newSingleThreadExecutor().execute(() -> {
+            noteRepo.updateSharedWith(noteId, userIdsToShareWith, listener);
+        });
+    }
+
     public void insertNote(Note note) {
         Executors.newSingleThreadExecutor().execute(() -> {
             final String tempId = (note.getId() == null || note.getId().isEmpty())
@@ -246,13 +306,19 @@ public class NotesViewModel extends AndroidViewModel {
     }
 
     public void setNotePinned(String noteId, boolean pinned) {
-        // find note and update optimistically
         Note target = null;
         synchronized (cachedAllNotes) {
             for (Note n : cachedAllNotes) {
                 if (n != null && n.getId() != null && n.getId().equals(noteId)) {
+
+                    if (n.getSharedWith() != null && !n.getSharedWith().isEmpty()) {
+                        Log.w(TAG, "Attempted to pin/unpin a shared note (" + noteId + "). Action blocked in ViewModel.");
+                        return;
+                    }
+
                     target = new Note(n.getId(), n.getTitle(), n.getContents(),
-                            System.currentTimeMillis(), n.getUserId(), n.getMainColor(), n.getAccentColor(), pinned);
+                            System.currentTimeMillis(), n.getUserId(), n.getMainColor(),
+                            n.getAccentColor(), pinned, n.getSharedWith());
                     break;
                 }
             }
@@ -285,29 +351,6 @@ public class NotesViewModel extends AndroidViewModel {
         );
     }
 
-    // ---------- Cache helpers ----------
-    private void updateCachedNote(Note note) {
-        synchronized (cachedAllNotes) {
-            for (int i = 0; i < cachedAllNotes.size(); i++) {
-                if (cachedAllNotes.get(i).getId().equals(note.getId())) {
-                    cachedAllNotes.set(i, note);
-                    applySortAndFilterAndPost();
-                    return;
-                }
-            }
-            cachedAllNotes.add(0, note); // not found -> add
-        }
-        applySortAndFilterAndPost();
-    }
-
-    private void removeCachedNote(String noteId) {
-        synchronized (cachedAllNotes) {
-            cachedAllNotes.removeIf(n -> n.getId().equals(noteId));
-        }
-        applySortAndFilterAndPost();
-    }
-
-    // ---------- Async fetch single note ----------
     public void getNoteByIdAsync(String noteId, NoteCallback cb) {
         if (noteId == null || noteId.isEmpty()) {
             if (cb != null) cb.onNoteLoaded(null);
@@ -316,6 +359,14 @@ public class NotesViewModel extends AndroidViewModel {
 
         synchronized (cachedAllNotes) {
             for (Note n : cachedAllNotes) {
+                if (n != null && noteId.equals(n.getId())) {
+                    if (cb != null) cb.onNoteLoaded(n);
+                    return;
+                }
+            }
+        }
+        synchronized (cachedSharedNotes) {
+            for (Note n : cachedSharedNotes) {
                 if (n != null && noteId.equals(n.getId())) {
                     if (cb != null) cb.onNoteLoaded(n);
                     return;
@@ -344,7 +395,6 @@ public class NotesViewModel extends AndroidViewModel {
         void onNoteLoadError(Exception e);
     }
 
-    // Helper: replace or add a note in cachedAllNotes
     private void upsertNoteInCache(Note note) {
         synchronized (cachedAllNotes) {
             for (int i = 0; i < cachedAllNotes.size(); i++) {
@@ -359,7 +409,6 @@ public class NotesViewModel extends AndroidViewModel {
         applySortAndFilterAndPost();
     }
 
-    // Helper: remove note from cache by ID
     private void removeNoteFromCache(String noteId) {
         synchronized (cachedAllNotes) {
             for (int i = 0; i < cachedAllNotes.size(); i++) {
