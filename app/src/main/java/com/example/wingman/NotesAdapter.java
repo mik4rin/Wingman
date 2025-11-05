@@ -7,7 +7,7 @@ import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
+import android.widget.ImageButton;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
@@ -25,18 +25,24 @@ public class NotesAdapter extends ListAdapter<Note, NotesAdapter.NoteViewHolder>
         void onNoteClick(Note note);
     }
 
+    public interface OnExportClickListener {
+        void onExportClick(Note note);
+    }
+
     public interface ContextMenuCallback {
         void onContextMenuRequested(int position, boolean fromPinned);
     }
 
     private final OnNoteClickListener listener;
+    private final OnExportClickListener exportListener;
     private ContextMenuCallback contextMenuCallback;
 
     private int selectedPosition = RecyclerView.NO_POSITION;
 
-    public NotesAdapter(OnNoteClickListener listener) {
+    public NotesAdapter(OnNoteClickListener listener, OnExportClickListener exportListener) {
         super(DIFF_CALLBACK);
         this.listener = listener;
+        this.exportListener = exportListener;
     }
 
     public void setContextMenuCallback(ContextMenuCallback callback) {
@@ -89,6 +95,7 @@ public class NotesAdapter extends ListAdapter<Note, NotesAdapter.NoteViewHolder>
         private final MaterialCardView cardView;
         private final TextView titleView;
         private final TextView contentView;
+        private final ImageButton exportButton;
 
         public NoteViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -96,6 +103,7 @@ public class NotesAdapter extends ListAdapter<Note, NotesAdapter.NoteViewHolder>
             cardView = itemView.findViewById(R.id.material_card_view);
             titleView = itemView.findViewById(R.id.note_title);
             contentView = itemView.findViewById(R.id.note_content);
+            exportButton = itemView.findViewById(R.id.exportNote_btn);
 
             itemView.setOnClickListener(v -> {
                 int pos = getAdapterPosition();
@@ -104,7 +112,13 @@ public class NotesAdapter extends ListAdapter<Note, NotesAdapter.NoteViewHolder>
                 }
             });
 
-            // This registers the context menu listener on the itemView
+            exportButton.setOnClickListener(v -> {
+                int pos = getAdapterPosition();
+                if (pos != RecyclerView.NO_POSITION && exportListener != null) {
+                    exportListener.onExportClick(getItem(pos));
+                }
+            });
+
             itemView.setOnCreateContextMenuListener(this);
 
             itemView.setOnLongClickListener(v -> {
@@ -113,7 +127,7 @@ public class NotesAdapter extends ListAdapter<Note, NotesAdapter.NoteViewHolder>
                     selectedPosition = pos;
                     contextMenuCallback.onContextMenuRequested(pos, false);
                 }
-                return false;  // Show context menu
+                return false;
             });
 
         }
@@ -146,6 +160,7 @@ public class NotesAdapter extends ListAdapter<Note, NotesAdapter.NoteViewHolder>
         @Override
         public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
             menu.setHeaderTitle("Select Action");
+            menu.add(Menu.NONE, R.id.action_export, Menu.NONE, "Export to PDF");
             menu.add(Menu.NONE, R.id.action_delete, Menu.NONE, "Delete");
             menu.add(Menu.NONE, R.id.action_pin, Menu.NONE, "Pin");
             menu.add(Menu.NONE, R.id.action_unpin, Menu.NONE, "Unpin");

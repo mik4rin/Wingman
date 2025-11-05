@@ -2,6 +2,7 @@
 <com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/material_card_view"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -17,36 +18,51 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="125dp"
-        android:padding="10dp">
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:minHeight="125dp">
+
+        <ImageButton
+            android:id="@+id/exportNote_btn"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:scaleType="fitCenter"
+            android:contentDescription="Export Note"
+            app:srcCompat="@drawable/export_icon"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/note_title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
             android:maxLines="1"
             android:text="Note Title"
+            android:textColor="@color/black"
             android:textSize="15sp"
             android:textStyle="bold"
-            android:textColor="@color/black"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="@id/exportNote_btn"
+            app:layout_constraintBottom_toBottomOf="@id/exportNote_btn"
+            app:layout_constraintEnd_toStartOf="@id/exportNote_btn"/>
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/note_content"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:minHeight="90dp"
-            android:paddingTop="8dp"
-            android:text="Content..."
+            android:paddingTop="4dp"
+            android:text="Content of the note goes here, potentially spanning multiple lines. This is a longer piece of text to demonstrate the layout."
             android:textColor="@color/black"
             android:textSize="13sp"
-            app:layout_constraintTop_toBottomOf="@id/note_title"
+            app:layout_constraintTop_toBottomOf="@id/exportNote_btn"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent" />
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constrainedHeight="true"
+            app:layout_constraintVertical_bias="0"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
 </com.google.android.material.card.MaterialCardView>
