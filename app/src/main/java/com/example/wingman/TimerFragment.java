@@ -17,11 +17,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.wingman.data.NotificationRepository;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class TimerFragment extends Fragment {
 
@@ -35,6 +41,9 @@ public class TimerFragment extends Fragment {
     private boolean isMusicEnabled = true;
     private NotificationRepository notificationRepository;
     private SharedPreferences prefs;
+    private FirebaseFirestore db;
+    private long sessionStartTime = 0;
+    private int currentSessionDuration = 25;
     public static boolean isTimerFragmentVisible = false;
 
     @Nullable
@@ -43,6 +52,7 @@ public class TimerFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_timer, container, false);
         notificationRepository = new NotificationRepository();
+        db = FirebaseFirestore.getInstance();
 
         prefs = requireActivity().getSharedPreferences("TimerPrefs", Context.MODE_PRIVATE);
         isMusicEnabled = prefs.getBoolean("music_enabled", true);
@@ -85,6 +95,23 @@ public class TimerFragment extends Fragment {
                     Toast.LENGTH_SHORT).show();
         });
 
+        CardView cardAnalytics = view.findViewById(R.id.cardAnalytics);
+        cardAnalytics.setOnClickListener(v -> {
+            if (getActivity() != null) {
+                getActivity().getSupportFragmentManager()
+                        .beginTransaction()
+                        .setCustomAnimations(
+                                R.anim.slide_in_right,
+                                R.anim.slide_out_left,
+                                R.anim.slide_in_left,
+                                R.anim.slide_out_right
+                        )
+                        .replace(R.id.fragment_container, new AnalyticsFragment())
+                        .addToBackStack(null)
+                        .commit();
+            }
+        });
+
         timerViewModel = new ViewModelProvider(requireActivity()).get(TimerViewModel.class);
 
         timerViewModel.isRunning.observe(getViewLifecycleOwner(), running -> {
@@ -117,6 +144,8 @@ public class TimerFragment extends Fragment {
                     pauseIntent.setAction("PAUSE");
                     requireContext().startService(pauseIntent);
                 }
+
+                saveCompletedSession();
 
                 if (isVisibleToUser) {
                     Toast.makeText(getContext(), "Time's up!", Toast.LENGTH_SHORT).show();
@@ -160,6 +189,7 @@ public class TimerFragment extends Fragment {
             } else {
                 timerViewModel.startTimer();
                 hasBeenStarted = true;
+                sessionStartTime = System.currentTimeMillis();
 
                 if (isMusicEnabled) {
                     Intent playIntent = new Intent(requireContext(), MusicService.class);
@@ -171,8 +201,14 @@ public class TimerFragment extends Fragment {
         });
 
         resetBtn.setOnClickListener(v -> {
-            timerViewModel.resetTimer();
+            timerViewModel.switchMode(1500000); // 25 minutes
+            currentSessionDuration = 25;
+
+            highlightSelectedMode(btnPomodoro);
+            tvModeLabel.setText("Pomodoro");
+
             hasBeenStarted = false;
+            sessionStartTime = 0;
             updateButtonText(false);
             circularProgressBar.setProgress(100);
             updateButtonVisibility();
@@ -187,27 +223,33 @@ public class TimerFragment extends Fragment {
 
         btnPomodoro.setOnClickListener(v -> {
             timerViewModel.switchMode(1500000); // 25 minutes
+            currentSessionDuration = 25;
             highlightSelectedMode(btnPomodoro);
             tvModeLabel.setText("Pomodoro");
             hasBeenStarted = false;
+            sessionStartTime = 0;
             updateButtonText(false);
             updateButtonVisibility();
         });
 
         btnShortBreak.setOnClickListener(v -> {
-            timerViewModel.switchMode(5000); // 5 minutes
+            timerViewModel.switchMode(300000); // 5 minutes
+            currentSessionDuration = 5;
             highlightSelectedMode(btnShortBreak);
             tvModeLabel.setText("Short Break");
             hasBeenStarted = false;
+            sessionStartTime = 0;
             updateButtonText(false);
             updateButtonVisibility();
         });
 
         btnLongBreak.setOnClickListener(v -> {
             timerViewModel.switchMode(900000); // 15 minutes
+            currentSessionDuration = 15;
             highlightSelectedMode(btnLongBreak);
             tvModeLabel.setText("Long Break");
             hasBeenStarted = false;
+            sessionStartTime = 0;
             updateButtonText(false);
             updateButtonVisibility();
         });
@@ -215,6 +257,26 @@ public class TimerFragment extends Fragment {
         highlightSelectedMode(btnPomodoro);
 
         return view;
+    }
+
+    private void saveCompletedSession() {
+        String userId = FirebaseAuth.getInstance().getUid();
+        if (userId == null) return;
+
+        Map<String, Object> session = new HashMap<>();
+        session.put("timestamp", System.currentTimeMillis());
+        session.put("durationMinutes", currentSessionDuration);
+        session.put("type", tvModeLabel.getText().toString());
+
+        db.collection("users")
+                .document(userId)
+                .collection("pomodoro_sessions")
+                .add(session)
+                .addOnSuccessListener(documentReference -> {
+                })
+                .addOnFailureListener(e -> {
+                    // Handle error silently
+                });
     }
 
     @Override

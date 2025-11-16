@@ -17,6 +17,7 @@ public class TimerViewModel extends AndroidViewModel {
     public MutableLiveData<Boolean> isRunning = new MutableLiveData<>(false);
     public MutableLiveData<Boolean> finished = new MutableLiveData<>(false);
     private boolean timerFinishedConsumed = false;
+
     public TimerViewModel(@NonNull Application application) {
         super(application);
     }
@@ -71,8 +72,6 @@ public class TimerViewModel extends AndroidViewModel {
                 isRunning.postValue(false);
                 finished.postValue(true);
             }
-
-
         }.start();
 
         isRunning.postValue(true);
@@ -129,5 +128,13 @@ public class TimerViewModel extends AndroidViewModel {
     public void setTimerFinishedConsumed(boolean consumed) {
         timerFinishedConsumed = consumed;
         if (consumed) finished.postValue(false);
+    }
+
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        if (countDownTimer != null) {
+            countDownTimer.cancel();
+        }
     }
 }

@@ -52,4 +52,11 @@
     <!-- Your main theme -->
     <style name="Theme.AddNotes" parent="Base.Theme.AddNotes" />
 
+        <style name="CustomAlertDialog" parent="Theme.AppCompat.Light.Dialog.Alert">
+            <item name="android:windowBackground">@android:color/transparent</item>
+            <item name="android:windowNoTitle">true</item>
+            <item name="android:windowIsFloating">true</item>
+        </style>
+
+
 </resources>
