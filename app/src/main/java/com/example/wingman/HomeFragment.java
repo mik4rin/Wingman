@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CalendarView;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -28,6 +29,7 @@ import androidx.fragment.app.Fragment;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -54,6 +56,7 @@ public class HomeFragment extends Fragment {
     private CircleImageView profileImage;
     private Spinner spinnerSort;
     private ListView listViewTasks;
+    private CalendarView calendarView;
     private Spinner upcomingSchedSortSpinner;
     private ListView upcomingSchedListView;
     private ArrayList<NewSchedule> upcomingSchedules = new ArrayList<>();
@@ -416,6 +419,7 @@ public class HomeFragment extends Fragment {
         greetingText = view.findViewById(R.id.greeting_text);
         motivationalText = view.findViewById(R.id.motivational_text);
         listViewTasks = view.findViewById(R.id.listViewItems);
+        calendarView = view.findViewById(R.id.calendarView);
         if (listViewTasks == null) {
             listViewTasks = view.findViewById(R.id.listViewTasks);
         }
@@ -431,6 +435,20 @@ public class HomeFragment extends Fragment {
         repository = new TaskRepository();
         schedRepo = new SchedRepository();
         notificationRepository = new NotificationRepository();
+
+        // Setup calendar date click listener
+        if (calendarView != null) {
+            calendarView.setOnDateChangeListener((view1, year, month, dayOfMonth) -> {
+                // Format the selected date
+                Calendar selectedCal = Calendar.getInstance();
+                selectedCal.set(year, month, dayOfMonth);
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+                String selectedDate = sdf.format(selectedCal.getTime());
+
+                // Show schedules for this date
+                showSchedulesForDate(selectedDate);
+            });
+        }
 
         ArrayAdapter<String> sortAdapter = new ArrayAdapter<>(
                 requireContext(),
@@ -1144,5 +1162,111 @@ public class HomeFragment extends Fragment {
 
     private String safeString(String s) {
         return s == null ? "" : s;
+    }
+
+    // NEW METHOD: Show schedules for selected calendar date
+    private void showSchedulesForDate(String selectedDate) {
+        String uid = getCurrentUid();
+        if (uid == null) {
+            Toast.makeText(requireContext(), "Please log in first", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Query schedules for the selected date
+        firestore.collection("schedules")
+                .whereEqualTo("userId", uid)
+                .whereEqualTo("date", selectedDate)
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    if (querySnapshot.isEmpty()) {
+                        Toast.makeText(requireContext(),
+                                "No schedules on this date",
+                                Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    // Build schedule list for the dialog
+                    ArrayList<NewSchedule> dateSchedules = new ArrayList<>();
+                    for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
+                        Sched s = doc.toObject(Sched.class);
+                        if (s != null) {
+                            s.setId(doc.getId());
+                            NewSchedule ns = new NewSchedule(
+                                    s.getId(),
+                                    s.getUserId(),
+                                    s.getTitle(),
+                                    s.getDescription(),
+                                    s.getDate(),
+                                    s.getSchedType(),
+                                    s.getTimestamp()
+                            );
+                            dateSchedules.add(ns);
+                        }
+                    }
+
+                    // Show dialog with schedules
+                    showScheduleListDialog(selectedDate, dateSchedules);
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(requireContext(),
+                            "Error loading schedules: " + e.getMessage(),
+                            Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    // NEW METHOD: Display schedule list in a dialog
+    private void showScheduleListDialog(String date, ArrayList<NewSchedule> schedules) {
+        // Inflate custom dialog layout
+        LayoutInflater inflater = LayoutInflater.from(requireContext());
+        View dialogView = inflater.inflate(R.layout.dialog_schedule_list, null);
+
+        // Get views from dialog
+        TextView dialogTitle = dialogView.findViewById(R.id.dialogTitle);
+        ListView scheduleListView = dialogView.findViewById(R.id.scheduleListView);
+        Button btnClose = dialogView.findViewById(R.id.btnClose);
+
+        // Format date for display
+        String formattedDate;
+        try {
+            SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+            SimpleDateFormat outputFormat = new SimpleDateFormat("MMMM dd, yyyy", Locale.ENGLISH);
+            Date d = inputFormat.parse(date);
+            formattedDate = outputFormat.format(d);
+        } catch (Exception e) {
+            formattedDate = date;
+        }
+
+        dialogTitle.setText("Schedules for " + formattedDate);
+
+        // Set up adapter
+        NewScheduleListAdapter adapter = new NewScheduleListAdapter(requireContext(), schedules);
+        scheduleListView.setAdapter(adapter);
+
+        // Create dialog
+        AlertDialog dialog = new AlertDialog.Builder(requireContext())
+                .setView(dialogView)
+                .setCancelable(true)
+                .create();
+
+        // Optional: Add click listener to view/edit individual schedules
+        scheduleListView.setOnItemClickListener((parent, view, position, id) -> {
+            if (position >= 0 && position < schedules.size()) {
+                NewSchedule selectedSchedule = schedules.get(position);
+                // You can add functionality here to edit/view schedule details
+                Toast.makeText(requireContext(),
+                        "Selected: " + selectedSchedule.getTitle(),
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // Close button
+        btnClose.setOnClickListener(v -> dialog.dismiss());
+
+        // Make dialog background transparent to show custom background
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        }
+
+        dialog.show();
     }
 }

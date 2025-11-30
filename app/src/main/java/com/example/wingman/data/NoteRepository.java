@@ -28,12 +28,11 @@ public class NoteRepository {
         auth = FirebaseAuth.getInstance();
     }
 
-    private String resolveCurrentUserId() {
+    public String resolveCurrentUserId() {
         FirebaseUser u = auth.getCurrentUser();
         return (u != null) ? u.getUid() : null;
     }
 
-    // --- Add new note ---
     public void addNote(Note note, OnFirestoreResultListener listener) {
         if (note == null) {
             listener.onError(new Exception("Note is null"));
@@ -61,22 +60,24 @@ public class NoteRepository {
                 .addOnFailureListener(listener::onError);
     }
 
-    // --- Full update (overwrite) ---
     public void updateNote(Note note, OnFirestoreResultListener listener) {
         if (note.getId() == null || note.getId().isEmpty()) {
             listener.onError(new IllegalArgumentException("Note ID is missing"));
             return;
         }
-        // Always refresh timestamp so listener fires
-        note.setTimestamp(System.currentTimeMillis());
+
+        java.util.Map<String, Object> updates = note.toMap();
+
+        updates.remove("userId");
+
+        updates.put("timestamp", System.currentTimeMillis());
 
         notesRef.document(note.getId())
-                .set(note)
+                .update(updates)
                 .addOnSuccessListener(aVoid -> listener.onSuccess(note.getId()))
                 .addOnFailureListener(listener::onError);
     }
 
-    // --- Partial update (specific fields) ---
     public void updateNoteFields(String noteId, Map<String, Object> updates, OnFirestoreResultListener listener) {
         if (noteId == null) {
             listener.onError(new Exception("noteId is null"));
@@ -89,7 +90,6 @@ public class NoteRepository {
                 .addOnFailureListener(listener::onError);
     }
 
-    // --- Pin/unpin ---
     public void updatePinnedState(String noteId, boolean pinned, OnFirestoreResultListener listener) {
         if (noteId == null) {
             listener.onError(new Exception("noteId is null"));
@@ -101,18 +101,76 @@ public class NoteRepository {
                 .addOnFailureListener(listener::onError);
     }
 
-    // --- Delete ---
-    public void deleteNote(String noteId, OnFirestoreResultListener listener) {
-        if (noteId == null) {
-            listener.onError(new Exception("noteId is null"));
+    // Inside com.example.wingman.data.NoteRepository.java
+
+    public void updateSharedWith(String noteId, List<String> sharedUserIds, OnFirestoreResultListener listener) {
+        String currentUserId = resolveCurrentUserId();
+        if (noteId == null || currentUserId == null) {
+            listener.onError(new Exception("User not signed in or noteId is null"));
             return;
         }
-        notesRef.document(noteId).delete()
-                .addOnSuccessListener(unused -> listener.onSuccess(noteId))
-                .addOnFailureListener(listener::onError);
+        final List<String> finalSharedUserIds;
+        if (sharedUserIds == null) {
+            finalSharedUserIds = new ArrayList<>();
+        } else {
+            finalSharedUserIds = sharedUserIds;
+        }
+
+        getNoteById(noteId, new OnFirestoreNoteListener() {
+            @Override
+            public void onSuccess(Note note) {
+                if (note == null || !currentUserId.equals(note.getUserId())) {
+                    Log.w(TAG, "User " + currentUserId + " attempted to update sharedWith on note " + noteId + " but is not the owner.");
+                    listener.onError(new SecurityException("Permission denied. Only the note owner can change sharing settings."));
+                    return;
+                }
+
+                notesRef.document(noteId)
+                        .update("sharedWith", finalSharedUserIds, "timestamp", System.currentTimeMillis())
+                        .addOnSuccessListener(unused -> listener.onSuccess(noteId))
+                        .addOnFailureListener(listener::onError);
+            }
+
+            @Override
+            public void onError(Exception e) {
+                listener.onError(e);
+            }
+        });
     }
 
-    // --- Get single note ---
+    public void deleteNote(String noteId, OnFirestoreResultListener listener) {
+        String currentUserId = resolveCurrentUserId();
+        if (noteId == null || currentUserId == null) {
+            listener.onError(new Exception("User not signed in or noteId is null"));
+            return;
+        }
+
+        getNoteById(noteId, new OnFirestoreNoteListener() {
+            @Override
+            public void onSuccess(Note note) {
+                if (note == null) {
+                    listener.onSuccess(noteId);
+                    return;
+                }
+
+                if (!currentUserId.equals(note.getUserId())) {
+                    Log.w(TAG, "User " + currentUserId + " attempted to delete note " + noteId + " but is not the owner.");
+                    listener.onError(new SecurityException("Permission denied. Only the note owner can delete the note."));
+                    return;
+                }
+
+                notesRef.document(noteId).delete()
+                        .addOnSuccessListener(unused -> listener.onSuccess(noteId))
+                        .addOnFailureListener(listener::onError);
+            }
+
+            @Override
+            public void onError(Exception e) {
+                listener.onError(e);
+            }
+        });
+    }
+
     public void getNoteById(String noteId, OnFirestoreNoteListener listener) {
         if (noteId == null) {
             listener.onError(new Exception("noteId is null"));
@@ -126,19 +184,16 @@ public class NoteRepository {
                             note.setId(doc.getId());
                             listener.onSuccess(note);
                         } else {
-                            // Document existed but failed to parse -> treat as null result
                             Log.w(TAG, "Document exists but failed to parse Note for id: " + noteId);
                             listener.onSuccess(null);
                         }
                     } else {
-                        // Document does not exist - return null as a valid "not found"
                         listener.onSuccess(null);
                     }
                 })
                 .addOnFailureListener(listener::onError);
     }
 
-    // --- One-time fetch: all notes ---
     public void getNotes(OnFirestoreNotesListener listener) {
         String userId = resolveCurrentUserId();
         if (userId == null) { listener.onError(new Exception("User not signed in")); return; }
@@ -163,7 +218,6 @@ public class NoteRepository {
                 });
     }
 
-    // --- One-time fetch: pinned notes ---
     public void getPinnedNotes(OnFirestoreNotesListener listener) {
         String userId = resolveCurrentUserId();
         if (userId == null) {
@@ -182,13 +236,12 @@ public class NoteRepository {
                         Note note = doc.toObject(Note.class);
                         if (note == null) note = new Note();
                         note.setId(doc.getId());
-                        ensureNoteHasUserId(note, userId); // repair missing userId
+                        ensureNoteHasUserId(note, userId);
                         notes.add(note);
                     }
                     listener.onSuccess(notes);
                 })
                 .addOnFailureListener(e -> {
-                    // fallback if Firestore asks for composite index
                     if (e instanceof FirebaseFirestoreException &&
                             ((FirebaseFirestoreException) e).getCode() == FirebaseFirestoreException.Code.FAILED_PRECONDITION) {
                         notesRef.whereEqualTo("userId", userId)
@@ -200,7 +253,7 @@ public class NoteRepository {
                                         Note note = doc.toObject(Note.class);
                                         if (note == null) note = new Note();
                                         note.setId(doc.getId());
-                                        ensureNoteHasUserId(note, userId); // repair missing userId
+                                        ensureNoteHasUserId(note, userId);
                                         if (note.isPinned()) notes.add(note);
                                     }
                                     listener.onSuccess(notes);
@@ -213,7 +266,6 @@ public class NoteRepository {
                 });
     }
 
-    // --- One-time fetch: unpinned notes ---
     public void getUnpinnedNotes(OnFirestoreNotesListener listener) {
         String userId = resolveCurrentUserId();
         if (userId == null) {
@@ -240,7 +292,6 @@ public class NoteRepository {
                 .addOnFailureListener(listener::onError);
     }
 
-    // --- Search (client-side filter) ---
     public void searchNotes(String keyword, OnFirestoreNotesListener listener) {
         String userId = resolveCurrentUserId();
         if (userId == null) {
@@ -270,7 +321,6 @@ public class NoteRepository {
                 .addOnFailureListener(listener::onError);
     }
 
-    // --- Realtime: all notes ---
     public ListenerRegistration listenToNotes(OnFirestoreNotesListener listener) {
         String userId = resolveCurrentUserId();
         if (userId == null) { listener.onError(new Exception("User not signed in")); return () -> { }; }
@@ -297,16 +347,43 @@ public class NoteRepository {
         });
     }
 
+    public ListenerRegistration listenToSharedNotes(OnFirestoreNotesListener listener) {
+        String userId = resolveCurrentUserId();
+        if (userId == null) {
+            listener.onError(new Exception("User not signed in"));
+            return () -> {};
+        }
+
+        Query q = notesRef.whereArrayContains("sharedWith", userId)
+                .orderBy("timestamp", Query.Direction.DESCENDING);
+
+        return q.addSnapshotListener((snapshots, e) -> {
+            if (e != null) {
+                Log.e(TAG, "Error listening to shared notes", e);
+                listener.onError(e);
+                return;
+            }
+            List<Note> notes = new ArrayList<>();
+            if (snapshots != null) {
+                for (QueryDocumentSnapshot doc : snapshots) {
+                    Note note = doc.toObject(Note.class);
+                    if (note == null) note = new Note();
+                    note.setId(doc.getId());
+                    notes.add(note);
+                }
+            }
+            listener.onSuccess(notes);
+        });
+    }
+
     private void ensureNoteHasUserId(Note note, String userId) {
         if (note.getUserId() == null || note.getUserId().isEmpty()) {
             note.setUserId(userId);
-            // Update Firestore so other devices can see it
             notesRef.document(note.getId()).update("userId", userId)
                     .addOnFailureListener(e -> Log.e(TAG, "Failed to repair userId for note " + note.getId(), e));
         }
     }
 
-    // --- Realtime: pinned notes (with fallback) ---
     public ListenerRegistration listenToPinnedNotes(OnFirestoreNotesListener listener) {
         String userId = resolveCurrentUserId();
         if (userId == null) {
@@ -325,7 +402,6 @@ public class NoteRepository {
                 Log.w(TAG, "primary pinned listener error: " + e.getMessage());
                 if (e instanceof FirebaseFirestoreException &&
                         ((FirebaseFirestoreException) e).getCode() == FirebaseFirestoreException.Code.FAILED_PRECONDITION) {
-                    // fallback: listen to all user's notes and filter pinned locally
                     Query fallback = notesRef.whereEqualTo("userId", userId)
                             .orderBy("timestamp", Query.Direction.DESCENDING);
                     regs[1] = fallback.addSnapshotListener((snap2, ex2) -> {
@@ -340,7 +416,7 @@ public class NoteRepository {
                                 Note note = doc.toObject(Note.class);
                                 if (note == null) note = new Note();
                                 note.setId(doc.getId());
-                                ensureNoteHasUserId(note, userId); // repair missing userId
+                                ensureNoteHasUserId(note, userId);
                                 if (note.isPinned()) pinned.add(note);
                             }
                         }
@@ -358,7 +434,7 @@ public class NoteRepository {
                     Note note = doc.toObject(Note.class);
                     if (note == null) note = new Note();
                     note.setId(doc.getId());
-                    ensureNoteHasUserId(note, userId); // repair missing userId
+                    ensureNoteHasUserId(note, userId);
                     notes.add(note);
                 }
             }

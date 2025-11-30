@@ -4,8 +4,13 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
+import android.widget.TextView;
+
+import androidx.appcompat.widget.AppCompatButton;
 
 import com.example.wingman.data.ClassSched;
 import com.example.wingman.data.ClassSchedRepository;
@@ -64,6 +69,9 @@ public class SchedulerClassInterface {
                             classSchedRepo.getAllForUser(getTask -> {
                                 if (!getTask.isSuccessful() || getTask.getResult() == null) return;
                                 List<ClassSched> scheds = getTask.getResult();
+
+                                // Find the schedule being edited
+                                ClassSched currentSched = null;
                                 for (ClassSched sched : scheds) {
                                     if (sched.getTitle().equals(title) &&
                                             sched.getDayIndex() == day &&
@@ -71,67 +79,44 @@ public class SchedulerClassInterface {
                                             sched.getStartMinute() == startMinute &&
                                             sched.getEndHour() == endHour &&
                                             sched.getEndMinute() == endMinute) {
-
-                                        int oldDay = sched.getDayIndex();
-                                        int oldStartHour = sched.getStartHour();
-                                        int oldStartMin = sched.getStartMinute();
-                                        boolean oldAlarmEnabled = sched.isAlarmEnabled();
-
-                                        sched.setTitle(newTitle);
-                                        sched.setStartHour(newStartHour);
-                                        sched.setStartMinute(newStartMinute);
-                                        sched.setEndHour(newEndHour);
-                                        sched.setEndMinute(newEndMinute);
-                                        sched.setDayIndex(newDayIndex);
-                                        sched.setMainColor(newOutline);
-                                        sched.setAccentColor(newBody);
-                                        sched.setAlarmEnabled(newAlarmEnabled);
-
-                                        classSchedRepo.update(sched, updateTask -> {
-                                            if (updateTask.isSuccessful()) {
-                                            } else {
-                                                Exception e = updateTask.getException();
-                                                if (e != null) e.printStackTrace();
-                                            }
-                                        });
-
-                                        if (newAlarmEnabled) {
-                                            ScheduleUtils.scheduleAlarm(context.getApplicationContext(), sched, true);
-                                        } else {
-                                            ScheduleUtils.cancelAlarm(context.getApplicationContext(), sched);
-                                        }
-
-                                        boolean dayChanged = (oldDay != newDayIndex);
-                                        boolean timeChanged = (oldStartHour != newStartHour || oldStartMin != newStartMinute);
-
-                                        if (newAlarmEnabled && (!oldAlarmEnabled || dayChanged || timeChanged)) {
-                                            String[] daysOfWeek = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday"};
-                                            String dayName = daysOfWeek[newDayIndex];
-                                            String timeStr = formatTime(newStartHour, newStartMinute);
-                                            String message = "Alarm is set for " + newTitle + " at " + dayName + ", " + timeStr;
-                                            new Handler(Looper.getMainLooper()).post(() ->
-                                                    com.google.android.material.snackbar.Snackbar.make(webView, message, com.google.android.material.snackbar.Snackbar.LENGTH_LONG).show());
-                                        } else if (!newAlarmEnabled && oldAlarmEnabled) {
-                                            String message = "Alarm is cancelled for " + newTitle;
-                                            new Handler(Looper.getMainLooper()).post(() ->
-                                                    com.google.android.material.snackbar.Snackbar.make(webView, message, com.google.android.material.snackbar.Snackbar.LENGTH_LONG).show());
-                                        }
-
-                                        String js = String.format(
-                                                "updateScheduleBlock('%s', %d, %d, %d, %d, %d, %d, %d, %d, '%s', '%s', '%s', %b);",
-                                                escapeJs(title),
-                                                day, startHour, startMinute,
-                                                newDayIndex, newStartHour, newStartMinute,
-                                                newEndHour, newEndMinute,
-                                                escapeJs(newTitle),
-                                                newOutline, newBody,
-                                                newAlarmEnabled
-                                        );
-
-                                        new Handler(Looper.getMainLooper()).post(() -> webView.evaluateJavascript(js, null));
+                                        currentSched = sched;
                                         break;
                                     }
                                 }
+
+                                if (currentSched == null) return;
+
+                                final ClassSched schedToUpdate = currentSched;
+
+                                // Create temporary schedule with new values for collision check
+                                ClassSched tempSched = new ClassSched();
+                                tempSched.setId(schedToUpdate.getId());
+                                tempSched.setTitle(newTitle);
+                                tempSched.setStartHour(newStartHour);
+                                tempSched.setStartMinute(newStartMinute);
+                                tempSched.setEndHour(newEndHour);
+                                tempSched.setEndMinute(newEndMinute);
+                                tempSched.setDayIndex(newDayIndex);
+
+                                // Check for collisions (excluding current schedule)
+                                boolean hasCollision = ScheduleCollisionDetector.hasClassScheduleCollision(
+                                        tempSched, scheds, schedToUpdate.getId());
+
+                                new Handler(Looper.getMainLooper()).post(() -> {
+                                    if (hasCollision) {
+                                        // Show collision warning
+                                        List<ClassSched> conflicts = ScheduleCollisionDetector.getConflictingClassSchedules(
+                                                tempSched, scheds, schedToUpdate.getId());
+                                        String conflictMsg = ScheduleCollisionDetector.createClassConflictMessage(
+                                                conflicts, newDayIndex);
+                                        showCollisionDialog(conflictMsg);
+                                    } else {
+                                        // No collision, proceed with update
+                                        updateSchedule(schedToUpdate, newTitle, newStartHour, newStartMinute,
+                                                newEndHour, newEndMinute, newDayIndex, newOutline, newBody,
+                                                newAlarmEnabled, title, day, startHour, startMinute);
+                                    }
+                                });
                             });
                         });
 
@@ -166,6 +151,103 @@ public class SchedulerClassInterface {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    private void updateSchedule(ClassSched sched, String newTitle, int newStartHour, int newStartMinute,
+                                int newEndHour, int newEndMinute, int newDayIndex, String newOutline,
+                                String newBody, boolean newAlarmEnabled, String oldTitle, int oldDay,
+                                int oldStartHour, int oldStartMinute) {
+        int oldStartMin = sched.getStartMinute();
+        boolean oldAlarmEnabled = sched.isAlarmEnabled();
+
+        sched.setTitle(newTitle);
+        sched.setStartHour(newStartHour);
+        sched.setStartMinute(newStartMinute);
+        sched.setEndHour(newEndHour);
+        sched.setEndMinute(newEndMinute);
+        sched.setDayIndex(newDayIndex);
+        sched.setMainColor(newOutline);
+        sched.setAccentColor(newBody);
+        sched.setAlarmEnabled(newAlarmEnabled);
+
+        classSchedRepo.update(sched, updateTask -> {
+            if (updateTask.isSuccessful()) {
+                // Success
+            } else {
+                Exception e = updateTask.getException();
+                if (e != null) e.printStackTrace();
+            }
+        });
+
+        if (newAlarmEnabled) {
+            ScheduleUtils.scheduleAlarm(context.getApplicationContext(), sched, true);
+        } else {
+            ScheduleUtils.cancelAlarm(context.getApplicationContext(), sched);
+        }
+
+        boolean dayChanged = (oldDay != newDayIndex);
+        boolean timeChanged = (oldStartHour != newStartHour || oldStartMin != newStartMinute);
+
+        if (newAlarmEnabled && (!oldAlarmEnabled || dayChanged || timeChanged)) {
+            String[] daysOfWeek = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday"};
+            String dayName = daysOfWeek[newDayIndex];
+            String timeStr = formatTime(newStartHour, newStartMinute);
+            String message = "Alarm is set for " + newTitle + " at " + dayName + ", " + timeStr;
+            new Handler(Looper.getMainLooper()).post(() ->
+                    com.google.android.material.snackbar.Snackbar.make(webView, message,
+                            com.google.android.material.snackbar.Snackbar.LENGTH_LONG).show());
+        } else if (!newAlarmEnabled && oldAlarmEnabled) {
+            String message = "Alarm is cancelled for " + newTitle;
+            new Handler(Looper.getMainLooper()).post(() ->
+                    com.google.android.material.snackbar.Snackbar.make(webView, message,
+                            com.google.android.material.snackbar.Snackbar.LENGTH_LONG).show());
+        }
+
+        String js = String.format(
+                "updateScheduleBlock('%s', %d, %d, %d, %d, %d, %d, %d, %d, '%s', '%s', '%s', %b);",
+                escapeJs(oldTitle),
+                oldDay, oldStartHour, oldStartMinute,
+                newDayIndex, newStartHour, newStartMinute,
+                newEndHour, newEndMinute,
+                escapeJs(newTitle),
+                newOutline, newBody,
+                newAlarmEnabled
+        );
+
+        new Handler(Looper.getMainLooper()).post(() -> webView.evaluateJavascript(js, null));
+    }
+
+    private void showCollisionDialog(String message) {
+        if (!(context instanceof androidx.fragment.app.FragmentActivity)) return;
+
+        new Handler(Looper.getMainLooper()).post(() -> {
+            androidx.fragment.app.FragmentActivity activity = (androidx.fragment.app.FragmentActivity) context;
+
+            View dialogView = LayoutInflater.from(activity)
+                    .inflate(R.layout.dialog_unsaved_changes, null);
+
+            android.app.AlertDialog collisionDialog = new android.app.AlertDialog.Builder(activity)
+                    .setView(dialogView)
+                    .setCancelable(false)
+                    .create();
+
+            TextView title = dialogView.findViewById(R.id.dialogTitleText);
+            TextView messageText = dialogView.findViewById(R.id.dialogMessageText);
+            AppCompatButton noBtn = dialogView.findViewById(R.id.buttonNo);
+            AppCompatButton yesBtn = dialogView.findViewById(R.id.btnYes);
+
+            title.setText("Schedule Conflict");
+            messageText.setText(message);
+
+            // Hide the No button since we only need OK
+            noBtn.setVisibility(View.GONE);
+
+            // Change Yes button to OK
+            yesBtn.setText("OK");
+            yesBtn.setOnClickListener(v -> collisionDialog.dismiss());
+
+            collisionDialog.show();
+        });
     }
 
     private void deleteBlockFromJS(String title, int day, int startHour, int startMinute, int endHour, int endMinute) {

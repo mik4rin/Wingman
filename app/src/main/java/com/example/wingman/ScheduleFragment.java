@@ -1,8 +1,6 @@
 package com.example.wingman;
 
 import android.app.AlertDialog;
-import android.app.DatePickerDialog;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -16,6 +14,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 import androidx.appcompat.widget.SearchView;
 
 import androidx.annotation.NonNull;
@@ -41,8 +40,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import android.text.TextUtils;
-
 import java.util.Locale;
 import java.util.Map;
 import java.util.HashMap;
@@ -275,6 +272,7 @@ public class ScheduleFragment extends Fragment {
                     (title, startHour, startMinute, endHour, endMinute,
                      dayIndex, outlineColor, bodyColor, alarmEnabled) -> {
 
+                        // Create temporary schedule for collision check
                         ClassSched newSched = new ClassSched();
                         newSched.setUserId(currentUid);
                         newSched.setTitle(title);
@@ -287,27 +285,31 @@ public class ScheduleFragment extends Fragment {
                         newSched.setAccentColor(bodyColor);
                         newSched.setAlarmEnabled(alarmEnabled);
 
-                        classSchedRepo.insert(newSched, task -> {
+                        // Get existing schedules and check for collisions
+                        classSchedRepo.getAllForUser(getTask -> {
+                            if (!getTask.isSuccessful()) return;
+
+                            List<ClassSched> existingSchedules = getTask.getResult();
+                            if (existingSchedules == null) existingSchedules = new ArrayList<>();
+
+                            // Check for collisions
+                            boolean hasCollision = ScheduleCollisionDetector.hasClassScheduleCollision(
+                                    newSched, existingSchedules, null);
+
+                            List<ClassSched> finalExistingSchedules = existingSchedules;
                             requireActivity().runOnUiThread(() -> {
-                                if (alarmEnabled) {
-                                    ScheduleUtils.scheduleAlarm(requireContext(), newSched, true);
+                                if (hasCollision) {
+                                    // Show collision warning
+                                    List<ClassSched> conflicts = ScheduleCollisionDetector.getConflictingClassSchedules(
+                                            newSched, finalExistingSchedules, null);
+                                    String conflictMsg = ScheduleCollisionDetector.createClassConflictMessage(
+                                            conflicts, dayIndex);
+
+                                    showCollisionDialog(conflictMsg);
+                                } else {
+                                    // No collision, proceed with insertion
+                                    insertClassSchedule(newSched);
                                 }
-
-                                String safeTitle = newSched.getTitle().replace("\\", "\\\\").replace("'", "\\'");
-                                String js = String.format(
-                                        "addScheduleBlock(%d, %d, %d, %d, %d, '%s', '%s', '%s', %b);",
-                                        newSched.getDayIndex(),
-                                        newSched.getStartHour(), newSched.getStartMinute(),
-                                        newSched.getEndHour(), newSched.getEndMinute(),
-                                        safeTitle,
-                                        newSched.getMainColor(),
-                                        newSched.getAccentColor(),
-                                        newSched.isAlarmEnabled()
-                                );
-                                webView.evaluateJavascript(js, null);
-
-                                latestClassSchedCount++;
-                                updateNoSchedulesPlaceholder();
                             });
                         });
                     }
@@ -375,6 +377,34 @@ public class ScheduleFragment extends Fragment {
         });
 
         return view;
+    }
+
+    private void insertClassSchedule(ClassSched newSched) {
+        classSchedRepo.insert(newSched, task -> {
+            requireActivity().runOnUiThread(() -> {
+                if (newSched.isAlarmEnabled()) {
+                    ScheduleUtils.scheduleAlarm(requireContext(), newSched, true);
+                }
+
+                String safeTitle = newSched.getTitle().replace("\\", "\\\\").replace("'", "\\'");
+                String js = String.format(
+                        "addScheduleBlock(%d, %d, %d, %d, %d, '%s', '%s', '%s', %b);",
+                        newSched.getDayIndex(),
+                        newSched.getStartHour(), newSched.getStartMinute(),
+                        newSched.getEndHour(), newSched.getEndMinute(),
+                        safeTitle,
+                        newSched.getMainColor(),
+                        newSched.getAccentColor(),
+                        newSched.isAlarmEnabled()
+                );
+                webView.evaluateJavascript(js, null);
+
+                latestClassSchedCount++;
+                updateNoSchedulesPlaceholder();
+
+                Toast.makeText(requireContext(), "Class schedule added successfully", Toast.LENGTH_SHORT).show();
+            });
+        });
     }
 
     private void sortByPriorityHighest() {
@@ -583,7 +613,22 @@ public class ScheduleFragment extends Fragment {
             @Override
             public void onScheduleSaved(String id, String title, String desc, String date, String type) {
                 if (id == null || id.isEmpty()) {
+                    // Creating new schedule - check for collisions
                     NewSchedule tmp = new NewSchedule(currentUid, title, desc, date, type, System.currentTimeMillis());
+
+                    // Check for collision
+                    boolean hasCollision = ScheduleCollisionDetector.hasGeneralScheduleCollision(
+                            tmp, schedules, null);
+
+                    if (hasCollision) {
+                        List<NewSchedule> conflicts = ScheduleCollisionDetector.getConflictingGeneralSchedules(
+                                tmp, schedules, null);
+                        String conflictMsg = ScheduleCollisionDetector.createGeneralConflictMessage(conflicts);
+                        showCollisionDialog(conflictMsg);
+                        return;
+                    }
+
+                    // No collision, proceed with insertion
                     Sched dbSched = new Sched(null, currentUid, title, desc, date, type, System.currentTimeMillis());
                     schedRepo.insert(dbSched, new com.example.wingman.data.OnFirestoreResultListener() {
                         @Override
@@ -598,6 +643,20 @@ public class ScheduleFragment extends Fragment {
                         @Override public void onError(Exception e) { }
                     });
                 } else {
+                    // Updating existing schedule - check for collisions excluding current
+                    NewSchedule tmp = new NewSchedule(id, currentUid, title, desc, date, type, System.currentTimeMillis());
+                    boolean hasCollision = ScheduleCollisionDetector.hasGeneralScheduleCollision(
+                            tmp, schedules, id);
+
+                    if (hasCollision) {
+                        List<NewSchedule> conflicts = ScheduleCollisionDetector.getConflictingGeneralSchedules(
+                                tmp, schedules, id);
+                        String conflictMsg = ScheduleCollisionDetector.createGeneralConflictMessage(conflicts);
+                        showCollisionDialog(conflictMsg);
+                        return;
+                    }
+
+                    // No collision, proceed with update
                     for (int i = 0; i < schedules.size(); i++) {
                         NewSchedule s = schedules.get(i);
                         if (s.getId() != null && s.getId().equals(id)) {
@@ -630,6 +689,31 @@ public class ScheduleFragment extends Fragment {
             }
         });
         dlg.show(getChildFragmentManager(), "NewScheduleDialog");
+    }
+
+    private void showCollisionDialog(String message) {
+        View dialogView = LayoutInflater.from(requireContext())
+                .inflate(R.layout.dialog_unsaved_changes, null);
+
+        AlertDialog collisionDialog = new AlertDialog.Builder(requireContext())
+                .setView(dialogView)
+                .setCancelable(false)
+                .create();
+
+        TextView title = dialogView.findViewById(R.id.dialogTitleText);
+        TextView messageText = dialogView.findViewById(R.id.dialogMessageText);
+        androidx.appcompat.widget.AppCompatButton noBtn = dialogView.findViewById(R.id.buttonNo);
+        androidx.appcompat.widget.AppCompatButton yesBtn = dialogView.findViewById(R.id.btnYes);
+
+        title.setText("Schedule Conflict");
+        messageText.setText(message);
+
+        noBtn.setVisibility(View.GONE);
+
+        yesBtn.setText("OK");
+        yesBtn.setOnClickListener(v -> collisionDialog.dismiss());
+
+        collisionDialog.show();
     }
 
     @Override

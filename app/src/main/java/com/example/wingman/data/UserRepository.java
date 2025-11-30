@@ -123,12 +123,48 @@ public class UserRepository {
                 .addOnFailureListener(listener::onError);
     }
 
+    public void searchUsersByEmail(String emailQuery, OnFirestoreUsersListener listener) {
+        if (emailQuery == null || emailQuery.trim().isEmpty()) {
+            listener.onSuccess(new ArrayList<>());
+            return;
+        }
+
+        String queryLower = emailQuery.toLowerCase().trim();
+
+        usersRef.whereGreaterThanOrEqualTo("email", queryLower)
+                .whereLessThanOrEqualTo("email", queryLower + "\uf8ff")
+                .limit(10)
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    List<User> users = new ArrayList<>();
+                    for (QueryDocumentSnapshot document : querySnapshot) {
+                        User user = document.toObject(User.class);
+                        users.add(user);
+                    }
+                    listener.onSuccess(users);
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Error searching users by email", e);
+                    listener.onError(e);
+                });
+    }
+
     public ListenerRegistration listenUserById(String uid, EventListener<DocumentSnapshot> listener) {
         return usersRef.document(uid).addSnapshotListener(listener);
     }
 
     public ListenerRegistration listenUserByUsername(String username, EventListener<com.google.firebase.firestore.QuerySnapshot> listener) {
         return usersRef.whereEqualTo("username", username).addSnapshotListener(listener);
+    }
+
+    public String getCurrentUserUid() {
+        FirebaseUser user = auth.getCurrentUser();
+        return (user != null) ? user.getUid() : null;
+    }
+
+    public interface OnFirestoreUsersListener {
+        void onSuccess(List<User> users);
+        void onError(Exception e);
     }
 
     public interface OnFirestoreResultListener {
@@ -159,5 +195,27 @@ public class UserRepository {
     public interface OnFirestoreUserWithNotesListener {
         void onSuccess(UserWithNotes result);
         void onError(Exception e);
+    }
+
+    public void getUsersByIds(List<String> uids, OnFirestoreUsersListener listener) {
+        if (uids == null || uids.isEmpty()) {
+            listener.onSuccess(new ArrayList<>());
+            return;
+        }
+
+        usersRef.whereIn("id", uids)
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    List<User> users = new ArrayList<>();
+                    for (QueryDocumentSnapshot document : querySnapshot) {
+                        User user = document.toObject(User.class);
+                        users.add(user);
+                    }
+                    listener.onSuccess(users);
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Error fetching users by UIDs", e);
+                    listener.onError(e);
+                });
     }
 }

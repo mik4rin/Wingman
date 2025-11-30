@@ -33,12 +33,15 @@ import com.example.wingman.data.OnFirestoreResultListener;
 import com.example.wingman.data.OnFirestoreTasksListener;
 import com.example.wingman.data.Task;
 import com.example.wingman.data.TaskRepository;
+import com.example.wingman.util.NotificationScheduler;
 
 import java.util.Calendar;
 import java.util.List;
 
 public class AddTaskDialogFragment extends DialogFragment {
     private static final String ARG_TASK = "arg_task";
+    private static final String TAG = "AddTaskDialog";
+
     private Task taskToEdit;
     private EditText editTextTaskName, editTextCourse, editTextDescription;
     private Switch switchDeadline;
@@ -61,6 +64,7 @@ public class AddTaskDialogFragment extends DialogFragment {
         void onBadgeUpdate();
     }
     private BadgeUpdateListener badgeUpdateListener;
+
     public void setBadgeUpdateListener(BadgeUpdateListener listener) {
         this.badgeUpdateListener = listener;
     }
@@ -72,7 +76,7 @@ public class AddTaskDialogFragment extends DialogFragment {
     public static AddTaskDialogFragment newInstance(Task task) {
         AddTaskDialogFragment fragment = new AddTaskDialogFragment();
         Bundle args = new Bundle();
-        args.putParcelable(ARG_TASK, task); // 🔹 use Parcelable
+        args.putParcelable(ARG_TASK, task);
         fragment.setArguments(args);
         return fragment;
     }
@@ -245,7 +249,6 @@ public class AddTaskDialogFragment extends DialogFragment {
         if (dialog != null && dialog.getWindow() != null) {
             View rootView = dialog.findViewById(R.id.dialog_root);
             if (rootView != null) {
-
                 int widthSpec = View.MeasureSpec.makeMeasureSpec(
                         ((ViewGroup) rootView.getParent()).getWidth(),
                         View.MeasureSpec.EXACTLY);
@@ -255,19 +258,16 @@ public class AddTaskDialogFragment extends DialogFragment {
                 int newHeight = rootView.getMeasuredHeight();
                 int width = (int) (requireContext().getResources().getDisplayMetrics().widthPixels * 0.9);
 
-
                 dialog.getWindow().setLayout(width, newHeight);
             }
         }
     }
 
-
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            taskToEdit = getArguments().getParcelable(ARG_TASK); // 🔹 use Parcelable
+            taskToEdit = getArguments().getParcelable(ARG_TASK);
         }
     }
 
@@ -290,7 +290,7 @@ public class AddTaskDialogFragment extends DialogFragment {
             calDeadline = Calendar.getInstance();
             calDeadline.set(selectedYear, selectedMonth, selectedDay, selectedHour, selectedMinute, 0);
         }
-        final Calendar deadline = calDeadline;  // must be final
+        final Calendar deadline = calDeadline;
 
         repository.getTasks(new OnFirestoreTasksListener() {
             @Override
@@ -315,7 +315,7 @@ public class AddTaskDialogFragment extends DialogFragment {
                 }
 
                 if (taskToEdit != null) {
-                    // update
+                    // UPDATE existing task
                     taskToEdit.setTitle(taskName);
                     taskToEdit.setCourse(course);
                     taskToEdit.setDescription(description);
@@ -325,6 +325,17 @@ public class AddTaskDialogFragment extends DialogFragment {
                         @Override
                         public void onSuccess(String id) {
                             requireActivity().runOnUiThread(() -> {
+                                // ✅ Schedule or cancel notifications based on deadline
+                                if (taskToEdit.getDeadline() > 0 && !taskToEdit.isCompleted()) {
+                                    NotificationScheduler.scheduleDeadlineAlarm(
+                                            requireContext(), taskToEdit);
+                                    Log.d(TAG, "Scheduled notifications for updated task: " + taskToEdit.getTitle());
+                                } else {
+                                    NotificationScheduler.cancelDeadline(
+                                            requireContext(), taskToEdit.getId());
+                                    Log.d(TAG, "Cancelled notifications for task: " + taskToEdit.getId());
+                                }
+
                                 Toast.makeText(requireContext(), "Task updated", Toast.LENGTH_SHORT).show();
                                 if (badgeUpdateListener != null) badgeUpdateListener.onBadgeUpdate();
                                 dismiss();
@@ -333,11 +344,12 @@ public class AddTaskDialogFragment extends DialogFragment {
 
                         @Override
                         public void onError(Exception e) {
-                            Log.e("AddTaskDialog", "Error updating", e);
+                            Log.e(TAG, "Error updating", e);
                             Toast.makeText(requireContext(), "Error updating task", Toast.LENGTH_LONG).show();
                         }
                     });
                 } else {
+                    // ADD new task
                     Task newTask = new Task();
                     newTask.setTitle(taskName);
                     newTask.setCourse(course);
@@ -349,6 +361,16 @@ public class AddTaskDialogFragment extends DialogFragment {
                         @Override
                         public void onSuccess(String id) {
                             requireActivity().runOnUiThread(() -> {
+                                // ✅ Set the ID returned from Firestore
+                                newTask.setId(id);
+
+                                // ✅ Schedule notifications if deadline is set
+                                if (newTask.getDeadline() > 0) {
+                                    NotificationScheduler.scheduleDeadlineAlarm(
+                                            requireContext(), newTask);
+                                    Log.d(TAG, "Scheduled notifications for new task: " + newTask.getTitle());
+                                }
+
                                 Toast.makeText(requireContext(), "Task added", Toast.LENGTH_SHORT).show();
                                 if (badgeUpdateListener != null) badgeUpdateListener.onBadgeUpdate();
                                 dismiss();
@@ -357,7 +379,7 @@ public class AddTaskDialogFragment extends DialogFragment {
 
                         @Override
                         public void onError(Exception e) {
-                            Log.e("AddTaskDialog", "Error adding", e);
+                            Log.e(TAG, "Error adding", e);
                             Toast.makeText(requireContext(), "Error adding task", Toast.LENGTH_LONG).show();
                         }
                     });
@@ -366,7 +388,7 @@ public class AddTaskDialogFragment extends DialogFragment {
 
             @Override
             public void onError(Exception e) {
-                Log.e("AddTaskDialog", "Error checking duplicates", e);
+                Log.e(TAG, "Error checking duplicates", e);
                 Toast.makeText(requireContext(), "Error validating task", Toast.LENGTH_LONG).show();
             }
         });
@@ -493,7 +515,6 @@ public class AddTaskDialogFragment extends DialogFragment {
         exitDialog.show();
     }
 
-
     @Override
     public void onStart() {
         super.onStart();
@@ -503,8 +524,4 @@ public class AddTaskDialogFragment extends DialogFragment {
             getDialog().getWindow().setBackgroundDrawableResource(android.R.color.transparent);
         }
     }
-
 }
-
-
-

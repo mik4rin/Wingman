@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -25,18 +26,30 @@ public class PinnedNotesAdapter extends ListAdapter<Note, PinnedNotesAdapter.Pin
         void onPinnedNoteClick(Note note);
     }
 
+    public interface OnExportClickListener {
+        void onExportClick(Note note);
+    }
+
+    public interface OnShareClickListener {
+        void onShareClick(Note note);
+    }
+
     public interface ContextMenuCallback {
         void onContextMenuRequested(int position, boolean fromPinned);
     }
 
     private final OnPinnedNoteClickListener listener;
+    private final OnExportClickListener exportListener;
+    private final OnShareClickListener shareListener;
     private ContextMenuCallback contextMenuCallback;
 
     private int selectedPosition = RecyclerView.NO_POSITION;
 
-    public PinnedNotesAdapter(OnPinnedNoteClickListener listener) {
+    public PinnedNotesAdapter(OnPinnedNoteClickListener listener, OnExportClickListener exportListener, OnShareClickListener shareListener) {
         super(DIFF_CALLBACK);
         this.listener = listener;
+        this.exportListener = exportListener;
+        this.shareListener = shareListener;
     }
 
     public void setContextMenuCallback(ContextMenuCallback callback) {
@@ -89,17 +102,35 @@ public class PinnedNotesAdapter extends ListAdapter<Note, PinnedNotesAdapter.Pin
         private final MaterialCardView cardView;
         private final TextView titleView;
         private final TextView contentView;
+        private final ImageButton exportButton;
+        private final ImageButton shareButton;
 
         public PinnedNoteViewHolder(@NonNull View itemView) {
             super(itemView);
             cardView = itemView.findViewById(R.id.material_card_view);
             titleView = itemView.findViewById(R.id.note_title);
             contentView = itemView.findViewById(R.id.note_content);
+            exportButton = itemView.findViewById(R.id.exportNote_btn);
+            shareButton = itemView.findViewById(R.id.shareNote_btn);
 
             itemView.setOnClickListener(v -> {
                 int pos = getAdapterPosition();
                 if (pos != RecyclerView.NO_POSITION) {
                     listener.onPinnedNoteClick(getItem(pos));
+                }
+            });
+
+            exportButton.setOnClickListener(v -> {
+                int pos = getAdapterPosition();
+                if (pos != RecyclerView.NO_POSITION && exportListener != null) {
+                    exportListener.onExportClick(getItem(pos));
+                }
+            });
+
+            shareButton.setOnClickListener(v -> {
+                int pos = getAdapterPosition();
+                if (pos != RecyclerView.NO_POSITION && shareListener != null) {
+                    shareListener.onShareClick(getItem(pos));
                 }
             });
 
@@ -109,9 +140,9 @@ public class PinnedNotesAdapter extends ListAdapter<Note, PinnedNotesAdapter.Pin
                 int pos = getAdapterPosition();
                 if (pos != RecyclerView.NO_POSITION && contextMenuCallback != null) {
                     selectedPosition = pos;
-                    contextMenuCallback.onContextMenuRequested(pos, false);
+                    contextMenuCallback.onContextMenuRequested(pos, true);
                 }
-                return false;  // Show context menu
+                return false;
             });
         }
 
@@ -143,6 +174,8 @@ public class PinnedNotesAdapter extends ListAdapter<Note, PinnedNotesAdapter.Pin
         @Override
         public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
             menu.setHeaderTitle("Select Action");
+            menu.add(Menu.NONE, R.id.action_export, Menu.NONE, "Export to PDF");
+            menu.add(Menu.NONE, R.id.action_share, Menu.NONE, "Share Note");
             menu.add(Menu.NONE, R.id.action_delete, Menu.NONE, "Delete");
             menu.add(Menu.NONE, R.id.action_pin, Menu.NONE, "Pin");
             menu.add(Menu.NONE, R.id.action_unpin, Menu.NONE, "Unpin");

@@ -19,16 +19,15 @@
                 android:layout_height="wrap_content"
                 android:paddingVertical="8dp"
                 android:paddingHorizontal="16dp"
-                android:background="?android:attr/colorBackground"                tools:context=".Notes_MainFragment">
+                android:background="@color/appbackround"
+                tools:context=".Notes_MainFragment">
 
-                <!-- Search Bar + Spinner Dropdown -->
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/search_bar_container"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
                     android:layout_marginBottom="8dp">
 
-                    <!-- Search Input -->
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/search_input_layout"
                         android:layout_width="0dp"
@@ -57,7 +56,6 @@
                             android:padding="0dp" />
                     </com.google.android.material.textfield.TextInputLayout>
 
-                    <!-- Spinner replacing 3-dot menu -->
                     <Spinner
                         android:id="@+id/spinnerOptions"
                         android:layout_width="100dp"
@@ -69,7 +67,6 @@
                         app:layout_constraintBottom_toBottomOf="parent" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
-                <!-- Pinned Notes Section -->
                 <LinearLayout
                     android:id="@+id/pinned_section_container"
                     android:layout_width="match_parent"
@@ -84,8 +81,10 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/dm_sans_bold"
                         android:text="Pinned Notes"
-                        android:textColor="?attr/colorOnSurface"
-                        android:textSize="18sp" />
+                        android:textColor="@color/blue"
+                        android:textSize="18sp"
+                        android:visibility="gone"
+                        tools:visibility="visible" />
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/mainNote_pinnedNotes"
@@ -93,14 +92,17 @@
                         android:layout_height="133dp"
                         android:overScrollMode="ifContentScrolls"
                         android:paddingTop="4dp"
-                        android:scrollbars="horizontal" />
+                        android:scrollbars="horizontal"
+                        android:visibility="gone"
+                        tools:visibility="visible" />
                 </LinearLayout>
 
                 <LinearLayout
                     android:id="@+id/notes_container"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:paddingVertical="4dp">
 
                     <TextView
                         android:id="@+id/notes_label"
@@ -108,15 +110,43 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/dm_sans_bold"
                         android:text="All Notes"
-                        android:textColor="?attr/colorOnSurface"
+                        android:textColor="@color/blue"
                         android:textSize="18sp" />
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/mainNote_allNotes"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:overScrollMode="ifContentScrolls"
+                        android:paddingTop="4dp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/shared_notes_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingVertical="4dp">
+
+                    <TextView
+                        android:id="@+id/shared_section_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/dm_sans_bold"
+                        android:text="Shared Notes"
+                        android:textColor="@color/blue"
+                        android:textSize="18sp"
+                        android:visibility="gone"
+                        tools:visibility="visible" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/mainNote_sharedNotes"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
                         android:paddingTop="4dp"
-                        android:overScrollMode="ifContentScrolls" />
+                        android:overScrollMode="ifContentScrolls"
+                        android:visibility="gone"
+                        tools:visibility="visible" />
                 </LinearLayout>
 
             </LinearLayout>
@@ -127,14 +157,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="You have no notes yet"
-            android:textColor="?attr/colorOnSurface"
+            android:textColor="@color/blue"
             android:fontFamily="@font/dm_sans_bold"
             android:textSize="16sp"
             android:gravity="center"
             android:visibility="gone"
             android:layout_gravity="center"/>
 
-        <!-- FAB -->
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/addnote_mainwindow"
             android:layout_width="wrap_content"
