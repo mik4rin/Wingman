@@ -5,55 +5,54 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import com.example.wingman.data.Notification;
-import com.example.wingman.data.NotificationRepository;
-import com.example.wingman.data.OnFirestoreObjectListener;
-import com.example.wingman.data.Task;
-import com.example.wingman.data.TaskRepository;
 import com.example.wingman.util.NotificationScheduler;
-
-import java.text.SimpleDateFormat;
-import java.util.Locale;
 
 public class DeadlineNotificationReceiver extends BroadcastReceiver {
     private static final String TAG = "DeadlineNotifReceiver";
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        String taskId = intent != null ? intent.getStringExtra("taskId") : null;
-        if (taskId == null) {
-            Log.w(TAG, "onReceive: missing taskId");
+        if (context == null || intent == null) {
+            Log.w(TAG, "Received null context or intent");
             return;
         }
 
-        TaskRepository taskRepo = new TaskRepository();
-        taskRepo.getTaskById(taskId, new OnFirestoreObjectListener<Task>() {
-            @Override
-            public void onSuccess(Task task) {
-                if (task == null) return;
+        try {
+            String taskId = intent.getStringExtra("taskId");
+            String taskTitle = intent.getStringExtra("taskTitle");
+            String notificationType = intent.getStringExtra("notificationType");
+            String userId = intent.getStringExtra("userId");
 
-                if (task.isCompleted()) {
-                    NotificationScheduler.cancelDeadline(context, task.getId());
-                    return;
-                }
-
-                String title = "Task Due";
-                String message = "Your task '" + (task.getTitle() == null ? "Untitled" : task.getTitle()) + "' is due now.";
-                String type = "deadline";
-
-                String userId = SessionManager.getUserId(context);
-
-                try {
-                    NotificationUtils.showAndLogTaskNotification(context, userId, task.getId(), type, title, message);
-                } catch (Exception e) {
-                    Log.e(TAG, "Error showing/upserting notification via NotificationUtils", e);
-                }
+            if (taskId == null) {
+                Log.w(TAG, "Task ID is null, cannot show notification");
+                return;
             }
 
-            @Override
-            public void onError(Exception e) {
-                Log.e(TAG, "Error fetching task for deadline", e);
-            }
-        });
+            // Use default values if not provided
+            if (taskTitle == null) taskTitle = "Task";
+            if (notificationType == null) notificationType = NotificationScheduler.TYPE_AT_DEADLINE;
+
+            Log.d(TAG, "Deadline alarm triggered - Task: " + taskTitle + ", Type: " + notificationType);
+
+            // Generate notification title and message
+            String notifTitle = NotificationScheduler.getNotificationTitle(notificationType);
+            String notifMessage = NotificationScheduler.getNotificationMessage(notificationType, taskTitle);
+
+            // Send notification using NotificationCenter
+            NotificationCenter.notifyAndLog(
+                    context,
+                    userId,
+                    taskId,
+                    notificationType,
+                    notifTitle,
+                    notifMessage,
+                    "tasks"
+            );
+
+            Log.d(TAG, "Successfully sent notification for task: " + taskTitle);
+
+        } catch (Exception e) {
+            Log.e(TAG, "Error processing deadline notification", e);
+        }
     }
 }

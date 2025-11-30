@@ -40,8 +40,11 @@
         </receiver>
         <receiver android:name=".ScheduleAlarmReceiver" />
         <receiver android:name=".StopAlarmReceiver" />
-        <receiver android:name=".DeadlineNotificationReceiver"
-            android:exported="true" />
+        <receiver
+            android:name=".DeadlineNotificationReceiver"
+            android:enabled="true"
+            android:exported="false">
+        </receiver>
         <activity android:name=".ForgotPasswordActivity" android:exported="false"/>
         <activity android:name=".LogIn" android:exported="false" />
         <activity android:name=".CreateAccount" android:exported="false" />
