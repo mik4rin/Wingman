@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Custom attribute for card background to support light/dark modes -->
+    <attr name="colorCardBackground" format="color" />
+    <attr name="colorText" format="color" />
+</resources>

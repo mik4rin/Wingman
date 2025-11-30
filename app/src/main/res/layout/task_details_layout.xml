@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/detailsContainer"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -12,7 +13,8 @@
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:layout_gravity="end"
-        android:src="@drawable/ic_x" />
+        android:src="@drawable/ic_x"
+        app:iconTint ="?attr/colorOnSurface"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -28,7 +30,7 @@
             android:layout_weight="1"
             android:fontFamily="@font/dm_sans_semibold"
             android:text="Application Development"
-            android:textColor="@color/blue"
+            android:textColor="?attr/colorOnSurface"
             android:textSize="15sp" />
 
         <TextView
@@ -37,7 +39,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/dm_sans_semibold"
             android:text="May 09, 2025 11:00 AM"
-            android:textColor="@color/blue"
+            android:textColor="?attr/colorOnSurface"
             android:textSize="12sp" />
     </LinearLayout>
 
@@ -49,7 +51,7 @@
         android:layout_marginTop="16dp"
         android:fontFamily="@font/dm_sans_bold"
         android:text="App Development"
-        android:textColor="@color/blue"
+        android:textColor="?attr/colorOnSurface"
         android:textSize="20sp" />
 
     <TextView
@@ -59,7 +61,7 @@
         android:layout_marginTop="16dp"
         android:fontFamily="@font/dm_sans_semibold"
         android:text="Description"
-        android:textColor="@color/blue"
+        android:textColor="?attr/colorOnSurface"
         android:textSize="15sp" />
 
     <ScrollView
@@ -74,6 +76,7 @@
             android:fontFamily="@font/dm_sans_semibold"
             android:paddingEnd="8dp"
             android:paddingRight="8dp"
+            android:textColor="?attr/colorOnSurface"
             android:text="Lorem ipsum..."
             android:textSize="12sp" />
     </ScrollView>
@@ -89,10 +92,10 @@
             android:id="@+id/edit_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:backgroundTint="@color/blue"
             android:fontFamily="@font/dm_sans_semibold"
             android:text="Edit"
-            android:textColor="@color/gold"
+            android:textColor="?attr/colorOnSecondary"
+            android:backgroundTint="?attr/colorSecondary"
             android:textAllCaps="false"
             android:capitalize="words"/>
 
@@ -102,10 +105,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:backgroundTint="@color/blue"
+            android:textColor="?attr/colorOnSecondary"
+            android:backgroundTint="?attr/colorSecondary"
             android:fontFamily="@font/dm_sans_semibold"
             android:text="Delete"
-            android:textColor="@color/gold"
             android:textAllCaps="false"
             android:capitalize="words"/>
     </LinearLayout>

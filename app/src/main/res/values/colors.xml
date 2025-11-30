@@ -4,6 +4,7 @@
     <color name="white">#FFFFFFFF</color>
     <color name="appbackround">#F5F5F5</color>
 
+
     <color name="gold">#c7b57e</color>
     <color name="transparent">#00000000</color>
     <color name="blue">#003060</color>
@@ -49,4 +50,7 @@
     <color name="aqua_accent">#FFE1F0</color>
 
     <color name="light_blue">#E3F2FD</color>
+
+    <color name="gray">#141218</color>
+
 </resources>

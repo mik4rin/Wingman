@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/appbackround">
+    android:background="?android:attr/colorBackground">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -72,7 +72,7 @@
                 android:layout_marginBottom="16dp"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="4dp"
-                android:backgroundTint="@color/blue">
+                android:backgroundTint="?attr/colorSecondary">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
@@ -88,7 +88,7 @@
                         android:scaleType="centerCrop"
                         android:src="@drawable/ic_flashcardcard"
                         android:alpha="0.4"
-                        app:tint="@color/gold" />
+                        app:tint="?attr/colorOnSecondary" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -105,7 +105,7 @@
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/dm_sans_bold"
                             android:text="FLASHCARDS"
-                            android:textColor="@color/gold"
+                            android:textColor="?attr/colorOnSecondary"
                             android:textSize="22sp" />
 
                         <TextView
@@ -114,7 +114,7 @@
                             android:layout_marginTop="8dp"
                             android:fontFamily="@font/dm_sans_semibold"
                             android:text="Create flashcard sets with questions and answers to review"
-                            android:textColor="@color/gold"
+                            android:textColor="?attr/colorOnSecondary"
                             android:alpha="0.85"
                             android:textSize="12sp"
                             android:lineSpacingExtra="2dp" />
@@ -129,7 +129,7 @@
                 android:layout_marginBottom="16dp"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="4dp"
-                android:backgroundTint="@color/blue">
+                android:backgroundTint="?attr/colorSecondary">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
@@ -145,7 +145,7 @@
                         android:scaleType="centerCrop"
                         android:src="@drawable/ic_pomodorocard"
                         android:alpha="0.4"
-                        app:tint="@color/gold" />
+                        app:tint="?attr/colorOnSecondary" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -162,7 +162,7 @@
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/dm_sans_bold"
                             android:text="POMODORO"
-                            android:textColor="@color/gold"
+                            android:textColor="?attr/colorOnSecondary"
                             android:textSize="22sp" />
 
                         <TextView
@@ -170,7 +170,7 @@
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/dm_sans_bold"
                             android:text="TIMER"
-                            android:textColor="@color/gold"
+                            android:textColor="?attr/colorOnSecondary"
                             android:textSize="22sp" />
 
                         <TextView
@@ -179,7 +179,7 @@
                             android:layout_marginTop="8dp"
                             android:fontFamily="@font/dm_sans_semibold"
                             android:text="3 modes: Focus, short break, and long break with optional music"
-                            android:textColor="@color/gold"
+                            android:textColor="?attr/colorOnSecondary"
                             android:alpha="0.85"
                             android:textSize="12sp"
                             android:lineSpacingExtra="2dp" />

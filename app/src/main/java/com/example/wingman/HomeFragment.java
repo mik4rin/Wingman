@@ -2,6 +2,7 @@ package com.example.wingman;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -697,17 +698,26 @@ public class HomeFragment extends Fragment {
                         profileImage.setImageResource(R.drawable.default_profile_picture);
                         return;
                     }
+
                     String username = doc.getString("username");
                     String profilePic = doc.getString("profilePicture");
+
+                    if (!isAdded() || getContext() == null) return;
+
                     greetingText.setText("Hi, " + (username != null ? username : "User"));
+
                     if (username != null) {
-                        requireActivity().getSharedPreferences("loginPrefs", getContext().MODE_PRIVATE)
-                                .edit().putString("username", username).apply();
+                        getContext().getSharedPreferences("loginPrefs", Context.MODE_PRIVATE)
+                                .edit()
+                                .putString("username", username)
+                                .apply();
                     }
+
                     if (profilePic == null || profilePic.equals("default") || profilePic.equals("default_profile_picture.jpg")) {
                         profileImage.setImageResource(R.drawable.default_profile_picture);
                         return;
                     }
+
                     String lower = profilePic.toLowerCase(Locale.ROOT);
                     boolean looksLikeUri =
                             lower.startsWith("http://") || lower.startsWith("https://") ||

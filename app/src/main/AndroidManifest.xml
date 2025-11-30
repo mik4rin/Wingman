@@ -19,7 +19,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Wingman"
+        android:theme="@style/Theme.AddNotes"
         android:name=".AppVisibilityTracker"
         tools:targetApi="31">
         <receiver

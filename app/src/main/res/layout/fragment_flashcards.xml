@@ -10,8 +10,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:gravity="center_horizontal"
-        android:background="@color/appbackround"
-        android:paddingTop="5dp"
+        android:background="?android:attr/colorBackground"        android:paddingTop="5dp"
         android:paddingBottom="16dp">
 
         <LinearLayout
@@ -31,14 +30,14 @@
                 android:contentDescription="Back"
                 android:scaleType="centerInside"
                 android:src="@drawable/ic_back"
-                app:tint="@color/blue" />
+                app:tint="?attr/colorOnSurface" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Back"
                 android:textSize="16sp"
-                android:textColor="@color/blue"
+                android:textColor="?attr/colorOnSurface"
                 android:fontFamily="@font/dm_sans_semibold"
                 android:layout_marginStart="6dp" />
 
@@ -52,7 +51,7 @@
             app:cardElevation="6dp"
             android:clickable="true"
             android:focusable="true"
-            app:cardBackgroundColor="@color/blue">
+            app:cardBackgroundColor="?attr/colorSecondary">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -68,7 +67,7 @@
                     android:src="@drawable/ic_add"
                     android:contentDescription="Add Card Icon"
                     android:layout_marginEnd="12dp"
-                    app:tint="@color/gold" />
+                    app:tint="?attr/colorOnSecondary"  />
 
                 <TextView
                     android:id="@+id/flashcardsText"
@@ -76,7 +75,7 @@
                     android:layout_height="wrap_content"
                     android:text="Add New Flashcard Set"
                     android:textSize="16sp"
-                    android:textColor="@color/gold"
+                    android:textColor="?attr/colorOnSecondary"
                     android:fontFamily="@font/dm_sans_semibold" />
 
             </LinearLayout>

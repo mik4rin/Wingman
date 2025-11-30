@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/appbackround">
+    android:background="?android:attr/colorBackground">
 
     <ScrollView
         android:id="@+id/scrollView"
@@ -20,7 +20,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:background="@color/appbackround"
+            android:background="?android:attr/colorBackground"
             android:padding="14dp">
 
             <TextView
@@ -28,8 +28,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="10:29"
-                android:textColor="@color/blue"
-                android:textSize="72sp"
+                android:textColor="?attr/colorOnSurface"                android:textSize="72sp"
                 android:fontFamily="@font/dm_sans_bold"
                 android:letterSpacing="-0.02"
                 android:layout_marginBottom="8dp"
@@ -40,8 +39,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Today, May 4, 2025"
-                android:textColor="@color/blue"
-                android:textSize="16sp"
+                android:textColor="?attr/colorOnSurface"                android:textSize="16sp"
                 android:fontFamily="@font/dm_sans_semibold"
                 android:layout_marginBottom="24dp"
                 android:alpha="0.8"
@@ -53,7 +51,7 @@
                 android:layout_marginBottom="16dp"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="6dp"
-                app:cardBackgroundColor="@color/blue">
+                app:cardBackgroundColor="?attr/colorCardBackground">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -129,7 +127,7 @@
                     android:layout_height="wrap_content"
                     android:text="Priority Tasks"
                     android:textSize="16sp"
-                    android:textColor="@color/blue"
+                    android:textColor="?attr/colorOnSurface"
                     android:fontFamily="@font/dm_sans_bold" />
 
                 <Spinner
@@ -137,6 +135,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_marginStart="16dp"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textSize="72sp"
                     android:popupBackground="@drawable/notification_dropdown_background"
                     />
             </LinearLayout>
@@ -147,7 +147,7 @@
                 app:cardCornerRadius="12dp"
                 app:cardElevation="4dp"
                 android:maxHeight="350dp"
-                app:cardBackgroundColor="@color/blue">
+                app:cardBackgroundColor="?attr/colorCardBackground">
 
                 <FrameLayout
                     android:layout_width="match_parent"
@@ -191,13 +191,15 @@
                     android:layout_height="wrap_content"
                     android:text="Upcoming Schedules"
                     android:textSize="16sp"
-                    android:textColor="@color/blue"
+                    android:textColor="?attr/colorOnSurface"
                     android:fontFamily="@font/dm_sans_bold" />
 
                 <Spinner
                     android:id="@+id/upcoming_sched_sort_spinner"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textSize="72sp"
                     android:layout_marginStart="16dp" />
             </LinearLayout>
 
@@ -207,7 +209,7 @@
                 app:cardCornerRadius="12dp"
                 app:cardElevation="4dp"
                 android:maxHeight="350dp"
-                app:cardBackgroundColor="@color/blue">
+                app:cardBackgroundColor="?attr/colorCardBackground">
 
                 <FrameLayout
                     android:layout_width="match_parent"

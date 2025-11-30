@@ -1,35 +1,58 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.AddNotes" parent="Theme.Material3.DayNight.NoActionBar">
-        <item name="colorPrimary">@android:color/black</item>
-        <item name="colorPrimaryVariant">@android:color/black</item>
-        <item name="colorOnPrimary">@android:color/white</item>
 
-        <item name="colorSecondary">@android:color/black</item>
-        <item name="colorSecondaryVariant">@android:color/black</item>
-        <item name="colorOnSecondary">@android:color/white</item>
+    <!-- Base Dark Theme -->
+    <style name="Base.Theme.AddNotes" parent="Theme.Material3.Dark.NoActionBar">
 
-        <item name="android:colorBackground">@android:color/black</item>
-        <item name="colorSurface">@android:color/black</item>
-        <item name="colorOnSurface">@android:color/white</item>
+        <!-- Primary colors -->
+        <item name="colorPrimary">#121212</item>
+        <item name="colorOnPrimary">#FFFFFFFF</item>
+        <item name="colorPrimaryContainer">#3C3C3C</item>
 
-        <item name="materialCardViewStyle">@style/Widget.MaterialComponents.CardView</item>
+        <!-- Secondary colors -->
+        <item name="colorSecondary">#FFFFFF</item>
+        <item name="colorOnSecondary">#000000</item>
+        <item name="colorSecondaryVariant">#2E2E2E</item>
+
+
+        <!-- Background & Surfaces -->
+        <item name="android:colorBackground">#212121</item>
+        <item name="colorCardBackground">#2E2E2E</item>
+
+        <item name="colorSurfaceContainer">#c7b57e</item>
+
+
+        <item name="colorSurface">#2E2E2E</item> <!-- lighter gray for cards -->
+        <item name="colorOnSurface">#FFFFFF</item>
+
+        <item name="colorSurfaceVariant">#333333</item>
+
+        <item name="colorText">#2E2E2E</item>
+
+        <!-- Cards -->
+        <item name="materialCardViewStyle">@style/CustomCardViewStyle</item>
     </style>
 
-    <!-- a ThemeOverlay just for PopupMenus -->
-    <style name="ThemeOverlay.App.PopupMenu.White" parent="ThemeOverlay.AppCompat.Light">
-        <item name="android:popupBackground">@android:color/white</item>
+    <!-- Card Style (lighter gray) -->
+    <style name="CustomCardViewStyle" parent="Widget.MaterialComponents.CardView">
+        <item name="cardBackgroundColor">#2E2E2E</item>
+        <item name="android:foreground">?attr/selectableItemBackground</item>
     </style>
 
-    <style name="CustomPopupMenu" parent="ThemeOverlay.AppCompat.Light">
-        <item name="android:popupBackground">#FFFFFF</item> <!-- White background -->
-        <item name="android:textColor">#000000</item>       <!-- Black text -->
+    <!-- Popup Menu (Dark Mode) -->
+    <style name="PopupMenuTheme" parent="ThemeOverlay.Material3.Dark">
+        <item name="android:popupBackground">?attr/colorSurface</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
     </style>
 
-    <style name="PopupMenu_Light" parent="ThemeOverlay.AppCompat.Light">
-        <!-- Optional: Customize further if needed -->
+
+
+    <style name="ScheduleDialog" parent="Theme.Material3.DayNight.Dialog">
+        <item name="colorSurface">#212121</item>
+        <item name="colorOnSurface">#FFFFFF</item>
+        <item name="colorSecondary">#FFFFFF</item>
+        <item name="colorOnSecondary">#000000</item>
     </style>
 
-    <!-- Your main theme -->
+    <!-- Main Theme -->
     <style name="Theme.AddNotes" parent="Base.Theme.AddNotes" />
 </resources>

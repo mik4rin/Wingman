@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -312,17 +313,29 @@ public class TimerFragment extends Fragment {
     }
 
     private void highlightSelectedMode(TextView selected) {
+        int selectedBackgroundColor = getThemeColor(R.attr.colorCardBackground);
+
+        int defaultTextColor = getThemeColor(R.attr.colorText);
+
+        // Reset all buttons to default
         btnPomodoro.setBackgroundResource(R.drawable.mode_button_default);
-        btnPomodoro.setTextColor(getResources().getColor(R.color.blue));
+        btnPomodoro.setTextColor(defaultTextColor);
 
         btnShortBreak.setBackgroundResource(R.drawable.mode_button_default);
-        btnShortBreak.setTextColor(getResources().getColor(R.color.blue));
+        btnShortBreak.setTextColor(defaultTextColor);
 
         btnLongBreak.setBackgroundResource(R.drawable.mode_button_default);
-        btnLongBreak.setTextColor(getResources().getColor(R.color.blue));
+        btnLongBreak.setTextColor(defaultTextColor);
 
-        selected.setBackgroundResource(R.drawable.mode_button_selected);
+        // Highlight the selected button
+        selected.setBackgroundColor(selectedBackgroundColor);
         selected.setTextColor(getResources().getColor(android.R.color.white));
+    }
+
+    private int getThemeColor(int attr) {
+        TypedValue typedValue = new TypedValue();
+        requireContext().getTheme().resolveAttribute(attr, typedValue, true);
+        return typedValue.data;
     }
 
     private void setModeButtonsEnabled(boolean enabled) {

@@ -14,7 +14,7 @@
         android:paddingHorizontal="16dp"
         android:paddingTop="16dp"
         android:paddingBottom="0dp"
-        android:background="@color/appbackround">
+        android:background="?android:attr/colorBackground">
 
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -39,7 +39,7 @@
                     android:text="Class Schedule"
                     android:textSize="20sp"
                     android:textStyle="bold"
-                    android:textColor="@color/blue"
+                    android:textColor="?attr/colorOnSurface"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -62,7 +62,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
                 android:text="Schedules"
-                android:textColor="@color/blue"
+                android:textColor="?attr/colorOnSurface"
                 android:textSize="20sp"
                 android:textStyle="bold"
                 app:layout_constraintTop_toBottomOf="@id/wv_scheduler"
@@ -104,6 +104,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
+                android:textColor="?attr/colorOnSurface"
+                android:textSize="72sp"
                 app:layout_constraintTop_toBottomOf="@id/search_container"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
@@ -113,7 +115,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="You have no schedules yet"
-                android:textColor="@color/blue"
+                android:textColor="?attr/colorOnSurface"
                 android:fontFamily="@font/dm_sans_bold"
                 android:textSize="16sp"
                 android:gravity="center"

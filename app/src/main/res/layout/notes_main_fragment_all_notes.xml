@@ -19,8 +19,7 @@
                 android:layout_height="wrap_content"
                 android:paddingVertical="8dp"
                 android:paddingHorizontal="16dp"
-                android:background="@color/appbackround"
-                tools:context=".Notes_MainFragment">
+                android:background="?android:attr/colorBackground"                tools:context=".Notes_MainFragment">
 
                 <!-- Search Bar + Spinner Dropdown -->
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -85,7 +84,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/dm_sans_bold"
                         android:text="Pinned Notes"
-                        android:textColor="@color/blue"
+                        android:textColor="?attr/colorOnSurface"
                         android:textSize="18sp" />
 
                     <androidx.recyclerview.widget.RecyclerView
@@ -109,7 +108,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/dm_sans_bold"
                         android:text="All Notes"
-                        android:textColor="@color/blue"
+                        android:textColor="?attr/colorOnSurface"
                         android:textSize="18sp" />
 
                     <androidx.recyclerview.widget.RecyclerView
@@ -128,7 +127,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="You have no notes yet"
-            android:textColor="@color/blue"
+            android:textColor="?attr/colorOnSurface"
             android:fontFamily="@font/dm_sans_bold"
             android:textSize="16sp"
             android:gravity="center"

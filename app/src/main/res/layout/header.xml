@@ -7,34 +7,36 @@
     android:layout_width="match_parent"
     android:layout_height="70dp"
     android:paddingVertical="12dp"
-    android:background="@color/appbackround">
+    android:background="?android:attr/colorBackground">
 
+    <!-- Page Title -->
     <TextView
         android:id="@+id/home_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Home"
         android:textSize="20sp"
-        android:textColor="@color/blue"
+        android:textColor="?attr/colorOnSurface"
         android:fontFamily="@font/dm_sans_semibold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         android:layout_marginStart="16dp" />
 
+    <!-- Settings Button -->
     <ImageButton
         android:id="@+id/settings_btn"
         android:layout_width="25dp"
         android:layout_height="25dp"
         android:background="@android:color/transparent"
         android:scaleType="centerInside"
-        app:tint="@color/blue"
-        app:srcCompat="@drawable/settings_button"
+        app:tint="?attr/colorOnSurface"        app:srcCompat="@drawable/settings_button"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginEnd="16dp" />
 
+    <!-- Notification Button Container -->
     <FrameLayout
         android:id="@+id/notification_btn_container"
         android:layout_width="25dp"
@@ -51,8 +53,7 @@
             android:background="@android:color/transparent"
             android:scaleType="centerInside"
             android:src="@drawable/notif_ic"
-            app:tint="@color/blue"
-            android:contentDescription="Notifications" />
+            app:tint="?attr/colorOnSurface"            android:contentDescription="Notifications" />
 
         <View
             android:id="@+id/notification_badge"
@@ -64,5 +65,7 @@
             android:background="@drawable/badge_background"
             android:visibility="gone" />
     </FrameLayout>
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

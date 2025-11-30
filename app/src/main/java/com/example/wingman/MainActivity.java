@@ -20,6 +20,7 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.PopupWindow;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.content.SharedPreferences;
@@ -29,6 +30,7 @@ import android.view.Gravity;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -90,8 +92,17 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        SharedPreferences prefs = getSharedPreferences("user_prefs", MODE_PRIVATE);
+        boolean isDarkMode = prefs.getBoolean("dark_mode", false);
+
+        AppCompatDelegate.setDefaultNightMode(
+                isDarkMode ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO
+        );
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
 
         timerViewModel = new ViewModelProvider(this).get(TimerViewModel.class);
 
@@ -129,7 +140,10 @@ public class MainActivity extends AppCompatActivity {
 
         notificationButton = findViewById(R.id.notification_btn);
         notificationButton.setOnClickListener(this::showNotificationDropdown);
+
+
         fabAdd = findViewById(R.id.fab_add_task);
+        fabAdd.hide();
         fabAdd.setOnClickListener(v -> {
             Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
             if (currentFragment instanceof TasksFragment) {
@@ -141,16 +155,49 @@ public class MainActivity extends AppCompatActivity {
         optionsButton.setOnClickListener(this::showPopupMenu);
 
 
-
-
         Log.d(TAG, "Login successful. Launching MainActivity.");
 
-        loadFragmentWithPosition(new HomeFragment(), HOME_POSITION, false);
-        highlightNavItem(R.id.nav_home);
+        if (savedInstanceState == null) {
+            String lastFragmentTag = prefs.getString("last_fragment_tag", null);
+
+            Fragment fragmentToShow = new HomeFragment();
+            int position = HOME_POSITION;
+
+            if (lastFragmentTag != null) {
+                switch (lastFragmentTag) {
+                    case "HomeFragment":
+                        fragmentToShow = new HomeFragment();
+                        position = HOME_POSITION;
+                        break;
+                    case "TasksFragment":
+                        fragmentToShow = new TasksFragment();
+                        position = TASKS_POSITION;
+                        break;
+                    case "ScheduleFragment":
+                        fragmentToShow = new ScheduleFragment();
+                        position = SCHEDULE_POSITION;
+                        break;
+                    case "Notes_MainWindow":
+                        fragmentToShow = new Notes_MainWindow();
+                        position = NOTES_POSITION;
+                        break;
+                    case "StudyFragment":
+                        fragmentToShow = new StudyFragment();
+                        position = STUDY_POSITION;
+                        break;
+                }
+            }
+
+            loadFragmentWithPosition(fragmentToShow, position, false);
+            highlightNavItem(navItemIdFromPosition(position));
+
+            updateFabVisibility(fragmentToShow);
+        }
+
+
 
 
         attachNotificationsListener();
-
         updateNotificationBadge();
         scheduleTaskDeadlineWorker();
 
@@ -181,14 +228,50 @@ public class MainActivity extends AppCompatActivity {
             NotificationManager manager = getSystemService(NotificationManager.class);
             if (manager != null) manager.createNotificationChannel(channel);
         }
-
-
-
-
-
-
         handleIntent(getIntent());
     }
+
+    private int navItemIdFromPosition(int position) {
+        switch (position) {
+            case HOME_POSITION:
+                return R.id.nav_home;
+            case TASKS_POSITION:
+                return R.id.nav_tasks;
+            case SCHEDULE_POSITION:
+                return R.id.nav_schedule;
+            case NOTES_POSITION:
+                return R.id.nav_notes;
+            case STUDY_POSITION:
+                return R.id.nav_study;
+            default:
+                return R.id.nav_home;
+        }
+    }
+
+
+    public void setupThemeSwitch(Switch themeSwitch) {
+        SharedPreferences prefs = getSharedPreferences("user_prefs", MODE_PRIVATE);
+        boolean isDarkMode = prefs.getBoolean("dark_mode", false);
+
+        themeSwitch.setChecked(isDarkMode);
+
+        themeSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            prefs.edit().putBoolean("dark_mode", isChecked).apply();
+
+            Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+            if (currentFragment != null) {
+                prefs.edit().putString("last_fragment_tag", currentFragment.getClass().getSimpleName()).apply();
+            }
+
+            AppCompatDelegate.setDefaultNightMode(
+                    isChecked ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO
+            );
+        });
+    }
+
+
+
+
 
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
@@ -393,6 +476,11 @@ public class MainActivity extends AppCompatActivity {
                 if (notificationType != null) args.putString("notification_type", notificationType);
                 fragment.setArguments(args);
             }
+
+            SharedPreferences prefs = getSharedPreferences("user_prefs", MODE_PRIVATE);
+            prefs.edit().putString("last_fragment_tag", fragment.getClass().getSimpleName()).apply();
+
+
             loadFragmentWithPosition(fragment, newPosition, true);
         }
     }

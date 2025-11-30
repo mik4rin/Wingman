@@ -25,8 +25,7 @@
             android:layout_weight="1"
             android:fontFamily="@font/dm_sans_semibold"
             android:text="Add New Task"
-            android:textColor="@color/blue"
-            android:textSize="16sp"
+            android:textColor="?attr/colorOnSurface"            android:textSize="16sp"
             android:textStyle="bold"
             android:gravity="center"/>
 
@@ -39,7 +38,8 @@
             android:contentDescription="Close"
             android:scaleType="centerInside"
             android:src="@drawable/ic_x"
-            app:tint="@color/blue"/>
+            app:iconTint="?attr/colorOnSurface"
+            />
     </LinearLayout>
 
 
@@ -47,8 +47,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Enter task name"
-        app:hintTextColor="@color/black"
-        app:boxStrokeColor="@color/blue"
+        app:hintTextColor="?attr/colorOnSurface"
+        app:boxStrokeColor="?attr/colorOnSurface"
         app:boxStrokeWidth="1dp"
         app:boxStrokeWidthFocused="1dp">
 
@@ -58,7 +58,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fontFamily="@font/dm_sans_semibold"
-            android:textColor="@color/black"
             android:singleLine="true"
             android:maxLines="1"
             android:textSize="16sp"
@@ -70,8 +69,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Enter course name"
-        app:hintTextColor="@color/black"
-        app:boxStrokeColor="@color/blue"
+        app:hintTextColor="?attr/colorOnSurface"
+        app:boxStrokeColor="?attr/colorOnSurface"
         android:layout_marginTop="12dp">
 
 
@@ -81,7 +80,6 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/dm_sans_semibold"
             android:singleLine="true"
-            android:textColor="@color/black"
             android:maxLines="1"
             android:textSize="16sp"
             android:padding="8dp" />
@@ -92,8 +90,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Enter description"
-        app:hintTextColor="@color/black"
-        app:boxStrokeColor="@color/blue"
+        app:hintTextColor="?attr/colorOnSurface"
+        app:boxStrokeColor="?attr/colorOnSurface"
         android:layout_marginTop="12dp">
 
 
@@ -103,7 +101,6 @@
             android:layout_height="wrap_content"
             android:inputType="textMultiLine"
             android:minLines="3"
-            android:textColor="@color/black"
             android:gravity="top|start"
             android:fontFamily="@font/dm_sans_semibold"
             android:textSize="16sp"
@@ -127,7 +124,7 @@
             android:fontFamily="@font/dm_sans_semibold"
             android:textSize="14sp"
             android:text="Set Deadline"
-            android:textColor="@color/blue" />
+            android:textColor="?attr/colorOnSurface"/>
 
 
         <Switch
@@ -155,11 +152,11 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:layout_weight="1"
-            android:backgroundTint="@color/blue"
+            android:textColor="?attr/colorOnSecondary"
+            android:backgroundTint="?attr/colorSecondary"
             android:fontFamily="@font/dm_sans_semibold"
             android:text="Set Time"
             android:textAllCaps="false"
-            android:textColor="@color/gold"
             android:textSize="16sp" />
 
 
@@ -170,11 +167,11 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:layout_weight="1"
-            android:backgroundTint="@color/blue"
+            android:textColor="?attr/colorOnSecondary"
+            android:backgroundTint="?attr/colorSecondary"
             android:fontFamily="@font/dm_sans_semibold"
             android:text="Set Date"
             android:textAllCaps="false"
-            android:textColor="@color/gold"
             android:textSize="16sp"  />
     </LinearLayout>
 
@@ -187,7 +184,7 @@
         android:paddingTop="5dp"
         android:text="No deadline set"
         android:textSize="14sp"
-        android:textColor="@color/blue" />
+        android:textColor="?attr/colorOnSurface" />
 
 
     <LinearLayout
@@ -218,11 +215,11 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:layout_weight="1"
-            android:backgroundTint="@color/blue"
+            android:textColor="?attr/colorOnSecondary"
+            android:backgroundTint="?attr/colorSecondary"
             android:fontFamily="@font/dm_sans_semibold"
             android:text="Add"
             android:textAllCaps="false"
-            android:textColor="@color/gold"
             android:textSize="16sp" />
     </LinearLayout>
 

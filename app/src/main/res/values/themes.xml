@@ -1,43 +1,54 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.Wingman" parent="Theme.Material3.DayNight.NoActionBar">
 
-    </style>
+    <!-- Base application theme (Wingman placeholder, kept) -->
+    <style name="Base.Theme.Wingman" parent="Theme.Material3.DayNight.NoActionBar" />
 
     <style name="Theme.Wingman" parent="Base.Theme.Wingman" />
-    <!-- Base application theme. -->
+
+    <!-- Base Light Theme (kept but updated background to #212121) -->
     <style name="Base.Theme.AddNotes" parent="Theme.Material3.DayNight.NoActionBar">
-        <item name="colorPrimary">@android:color/black</item>
+
+        <!-- Primary colors -->
+        <item name="colorPrimary">#003060</item>  <!-- background tint for buttons,etc.-->
+        <item name="colorOnPrimary">#003060</item> <!-- light icon tint -->
         <item name="colorPrimaryVariant">@android:color/black</item>
-        <item name="colorOnPrimary">@android:color/white</item>
 
-        <item name="colorSecondary">@android:color/black</item>
-        <item name="colorSecondaryVariant">@android:color/black</item>
-        <item name="colorOnSecondary">@android:color/white</item>
+        <!-- Secondary colors -->
+        <item name="colorSecondary">#003060</item>
+        <item name="colorOnSecondary">#c7b57e</item>
+        <item name="colorSecondaryVariant">#003060</item>
 
-        <item name="android:colorBackground">@android:color/black</item>
-        <item name="colorSurface">@android:color/black</item>
-        <item name="colorOnSurface">@android:color/white</item>
+        <!-- Background and surfaces - CUSTOM DARK GRAY -->
+        <item name="android:colorBackground">#FFFFFFFF</item>  <!-- light background -->
+        <item name="colorCardBackground">@color/blue</item>  <!-- cards background -->
 
+        <item name="colorSurface">#FFFFFFFF</item> <!-- light surface -->
+        <item name="colorOnSurface">#003060</item> <!-- text on surface/cards -->
+
+        <item name="colorSurfaceContainer">#003060</item>
+
+
+        <item name="colorText">#003060</item>
+
+
+        <!-- Card style -->
         <item name="materialCardViewStyle">@style/Widget.MaterialComponents.CardView</item>
-
-
     </style>
 
-    <!-- a ThemeOverlay just for PopupMenus -->
+    <!-- Popup Menus -->
     <style name="ThemeOverlay.App.PopupMenu.White" parent="ThemeOverlay.AppCompat.Light">
         <item name="android:popupBackground">@android:color/white</item>
     </style>
 
-    <style name="CustomPopupMenu" parent="ThemeOverlay.AppCompat.Light">
-        <item name="android:popupBackground">#FFFFFF</item> <!-- White background -->
-        <item name="android:textColor">#000000</item>       <!-- Black text -->
+    <style name="PopupMenuTheme" parent="ThemeOverlay.Material3.Light">
+        <item name="android:popupBackground">?attr/colorSurface</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
     </style>
 
-    <style name="PopupMenu_Light" parent="ThemeOverlay.AppCompat.Light">
-        <!-- Optional: Customize further if needed -->
-    </style>
 
+    <style name="PopupMenu_Light" parent="ThemeOverlay.AppCompat.Light" />
+
+    <!-- Notes Edit Screen -->
     <style name="AppTheme.NotesEdit" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="android:windowIsTranslucent">false</item>
         <item name="android:windowBackground">@color/white</item>
@@ -45,11 +56,15 @@
         <item name="android:windowContentOverlay">@null</item>
     </style>
 
-    <!-- Scheduler -->
-    <style name="ScheduleDialog" parent="Theme.Material3.Light.Dialog">
+    <!-- Scheduler Dialog -->
+    <style name="ScheduleDialog" parent="Theme.Material3.DayNight.Dialog">
+        <item name="colorSurface">#FFFFFF</item>
+        <item name="colorOnSurface">#003060</item>
+        <item name="colorSecondary">#003060</item>
+        <item name="colorOnSecondary">#c7b57e</item>
     </style>
 
-    <!-- Your main theme -->
+    <!-- Main Theme -->
     <style name="Theme.AddNotes" parent="Base.Theme.AddNotes" />
 
 </resources>

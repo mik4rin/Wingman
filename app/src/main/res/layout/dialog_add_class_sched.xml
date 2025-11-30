@@ -3,12 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:fillViewport="true"
     android:paddingStart="16dp"
     android:paddingEnd="16dp"
     android:paddingTop="8dp"
     android:paddingBottom="16dp"
-    android:background="@drawable/bgborder">
+    android:fillViewport="false"
+    android:elevation="0dp"
+    android:background="@drawable/bgclass_sched">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -31,7 +32,7 @@
                 android:layout_weight="1"
                 android:fontFamily="@font/dm_sans_semibold"
                 android:text="New Class Schedule"
-                android:textColor="@color/blue"
+                android:textColor="?attr/colorOnSurface"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:gravity="center"
@@ -45,7 +46,7 @@
                 android:contentDescription="Close"
                 android:scaleType="centerInside"
                 android:src="@drawable/ic_x"
-                app:tint="@color/blue"/>
+                app:iconTint="?attr/colorOnPrimary" />
         </LinearLayout>
 
         <!-- Color selector -->
@@ -55,7 +56,7 @@
             android:layout_marginBottom="5dp"
             android:fontFamily="@font/dm_sans_semibold"
             android:text="Color"
-            android:textColor="@color/blue"
+            android:textColor="?attr/colorOnSurface"
             android:textSize="16sp"
             android:textStyle="bold" />
 
@@ -66,7 +67,7 @@
             android:layout_marginBottom="15dp"
             app:cardElevation="0dp"
             app:strokeWidth="0dp"
-            app:cardBackgroundColor="@android:color/white">
+            app:cardBackgroundColor="?attr/colorCardBackground">
 
             <HorizontalScrollView
                 android:layout_width="match_parent"
@@ -77,7 +78,8 @@
                     android:id="@+id/color_buttons_container"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal" />
+                    android:orientation="horizontal"
+                    />
             </HorizontalScrollView>
         </com.google.android.material.card.MaterialCardView>
 
@@ -86,8 +88,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"
-            app:boxStrokeColor="@color/blue"
-            app:hintTextColor="@color/blue"
+            app:hintTextColor="?attr/colorOnSurface"
+            app:boxStrokeColor="?attr/colorOnSurface"
             app:boxCornerRadiusTopStart="12dp"
             app:boxCornerRadiusTopEnd="12dp"
             app:boxCornerRadiusBottomStart="12dp"
@@ -101,9 +103,11 @@
                 android:maxLines="1"
                 android:fontFamily="@font/dm_sans_semibold"
                 android:hint="Enter class schedule"
-                android:padding="16dp"
-                android:textSize="16sp" />
+                android:textColor="?attr/colorOnSurface"
+            android:padding="16dp"
+            android:textSize="16sp" />
         </com.google.android.material.textfield.TextInputLayout>
+
 
         <!-- Time Pickers -->
         <LinearLayout
@@ -135,6 +139,7 @@
                     android:id="@+id/sched_hour_start"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+
                     android:theme="@style/NumberPickerStyle" />
             </LinearLayout>
 
@@ -232,8 +237,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="0dp"
-            app:boxStrokeColor="@color/blue"
-            app:hintTextColor="@color/blue"
+            app:hintTextColor="?attr/colorOnSurface"
+            app:boxStrokeColor="?attr/colorOnSurface"
             app:boxCornerRadiusTopStart="12dp"
             app:boxCornerRadiusTopEnd="12dp"
             app:boxCornerRadiusBottomStart="12dp"
@@ -247,6 +252,7 @@
                 android:focusable="false"
                 android:fontFamily="@font/dm_sans_semibold"
                 android:hint="Select day"
+                app:hintTextColor="?attr/colorOnSurface"
                 android:padding="16dp"
                 android:textSize="16sp" />
         </com.google.android.material.textfield.TextInputLayout>
@@ -265,7 +271,7 @@
                 android:text="Alarm on start time"
                 android:textAlignment="textEnd"
                 android:fontFamily="@font/dm_sans_semibold"
-                android:textColor="@color/blue"
+                android:textColor="?attr/colorOnSurface"
                 android:thumbTint="@color/gold"
                 android:textSize="13sp"/>
         </LinearLayout>
@@ -298,11 +304,11 @@
                 android:layout_height="48dp"
                 android:layout_marginStart="8dp"
                 android:layout_weight="1"
-                android:backgroundTint="@color/blue"
-                android:textSize="16sp"
-                android:text="Create"
                 android:fontFamily="@font/dm_sans_semibold"
-                android:textColor="@color/gold"
+                android:text="Create"
+                android:textColor="?attr/colorOnSecondary"
+                android:backgroundTint="?attr/colorSecondary"
+                android:textSize="16sp"
                 android:textStyle="bold"
                 app:cornerRadius="3dp" />
         </LinearLayout>

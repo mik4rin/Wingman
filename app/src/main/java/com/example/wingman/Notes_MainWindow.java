@@ -7,7 +7,10 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.ContextMenu;
+import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -258,12 +261,18 @@ public class Notes_MainWindow extends Fragment {
     }
 
     @Override
-    public void onCreateContextMenu(@NonNull android.view.ContextMenu menu,
-                                    @NonNull View v,
-                                    @Nullable android.view.ContextMenu.ContextMenuInfo menuInfo) {
+    public void onCreateContextMenu(@NonNull ContextMenu menu, @NonNull View v,
+                                    @Nullable ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
-        requireActivity().getMenuInflater().inflate(R.menu.notes_context_menu, menu);
+
+        // Apply your popup theme here
+        Context wrapper = new ContextThemeWrapper(requireContext(), R.style.PopupMenuTheme);
+
+        // Use THIS inflater, not the Activity's
+        MenuInflater inflater = new MenuInflater(wrapper);
+        inflater.inflate(R.menu.notes_context_menu, menu);
     }
+
 
     @Override
     public boolean onContextItemSelected(@NonNull android.view.MenuItem item) {

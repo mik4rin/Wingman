@@ -5,8 +5,7 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/appbackround"
-        tools:context=".Tasks_MainFragment">
+        android:background="?android:attr/colorBackground"        tools:context=".Tasks_MainFragment">
 
         <ScrollView
             android:layout_width="match_parent"
@@ -20,7 +19,7 @@
                 android:layout_height="wrap_content"
                 android:paddingVertical="8dp"
                 android:paddingHorizontal="16dp"
-                android:background="@color/appbackround">
+                android:background="?android:attr/colorBackground">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
@@ -63,6 +62,7 @@
                         android:layout_marginTop="8dp"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
+                        android:textColor="?attr/colorOnSurface"
                         app:layout_constraintBottom_toBottomOf="parent" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -73,7 +73,7 @@
                     android:layout_marginTop="8dp"
                     android:fontFamily="@font/dm_sans_semibold"
                     android:text="Tasks"
-                    android:textColor="@color/blue"
+                    android:textColor="?attr/colorOnSurface"
                     android:textSize="20sp" />
 
                 <FrameLayout
@@ -97,7 +97,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:text="You have no tasks yet"
-                        android:textColor="@color/blue"
+                        android:textColor="?attr/colorOnSurface"
                         android:textSize="16sp"
                         android:fontFamily="@font/dm_sans_semibold"
                         android:gravity="center"

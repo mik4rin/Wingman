@@ -26,6 +26,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.Manifest;
@@ -77,9 +78,16 @@ public class EditProfileFragment extends Fragment {
     private FirebaseAuth auth;
     private FirebaseFirestore db;
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_editprofile, container, false);
+
+        Switch themeSwitch = rootView.findViewById(R.id.theme_switch);
+
+        if (getActivity() instanceof MainActivity) {
+            ((MainActivity) getActivity()).setupThemeSwitch(themeSwitch);
+        }
 
         if (getActivity() instanceof MainActivity) {
             ((MainActivity) getActivity()).hideAppBars();

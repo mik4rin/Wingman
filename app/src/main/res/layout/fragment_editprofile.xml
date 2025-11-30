@@ -3,8 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/appbackround"
-    android:fillViewport="true">
+    android:background="?android:attr/colorBackground"    android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -27,7 +26,7 @@
                 android:padding="4dp"
                 android:scaleType="centerInside"
                 android:src="@drawable/ic_back"
-                app:tint="@color/blue" />
+                app:tint="?attr/colorOnSurface" />
 
             <TextView
                 android:id="@+id/headerTitle"
@@ -37,8 +36,7 @@
                 android:gravity="center"
                 android:fontFamily="@font/dm_sans_semibold"
                 android:text="Profile Settings"
-                android:textColor="@color/blue"
-                android:textSize="18sp" />
+                android:textColor="?attr/colorOnSurface"                android:textSize="18sp" />
 
             <View
                 android:layout_width="35dp"
@@ -60,8 +58,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:gravity="center_horizontal"
-                android:background="@color/blue"
-                android:padding="24dp">
+                android:background="?attr/colorCardBackground"                android:padding="24dp">
 
                 <de.hdodenhof.circleimageview.CircleImageView
                     android:id="@+id/profile_image"
@@ -136,8 +133,7 @@
             android:layout_marginBottom="12dp"
             android:fontFamily="@font/dm_sans_semibold"
             android:text="Account Information"
-            android:textColor="@color/blue"
-            android:textSize="14sp"
+            android:textColor="?attr/colorOnSurface"            android:textSize="14sp"
             android:alpha="0.7" />
 
         <androidx.cardview.widget.CardView
@@ -188,8 +184,7 @@
             android:layout_marginBottom="12dp"
             android:fontFamily="@font/dm_sans_semibold"
             android:text="Security"
-            android:textColor="@color/blue"
-            android:textSize="14sp"
+            android:textColor="?attr/colorOnSurface"            android:textSize="14sp"
             android:alpha="0.7" />
 
         <androidx.cardview.widget.CardView
@@ -303,9 +298,47 @@
             android:layout_marginBottom="12dp"
             android:fontFamily="@font/dm_sans_semibold"
             android:text="Account Management"
-            android:textColor="@color/blue"
-            android:textSize="14sp"
+            android:textColor="?attr/colorOnSurface"            android:textSize="14sp"
             android:alpha="0.7" />
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardThemeSwitch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginBottom="12dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="2dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:background="@android:color/white"
+                android:padding="16dp"
+                android:gravity="center_vertical">
+
+                <!-- Label -->
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Dark Mode"
+                    android:textColor="@color/blue"
+                    android:textSize="15sp"
+                    android:fontFamily="@font/dm_sans_semibold" />
+
+                <!-- Theme Switch -->
+                <Switch
+                    android:id="@+id/theme_switch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textOff="☀️"
+                    android:textOn="🌙"
+                    android:switchMinWidth="40dp"
+                    android:showText="true"
+                    android:textColor="@color/blue" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
 
         <androidx.cardview.widget.CardView
             android:id="@+id/cardDeleteAccount"

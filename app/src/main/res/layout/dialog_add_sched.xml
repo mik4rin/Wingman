@@ -34,7 +34,7 @@
                 android:layout_weight="1"
                 android:fontFamily="@font/dm_sans_semibold"
                 android:text="Add New Schedule"
-                android:textColor="@color/blue"
+                android:textColor="?attr/colorOnSurface"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:gravity="center"
@@ -48,15 +48,16 @@
                 android:contentDescription="Close"
                 android:scaleType="centerInside"
                 android:src="@drawable/ic_x"
-                app:tint="@color/blue"/>
+                app:iconTint="?attr/colorOnSurface"
+                />
         </LinearLayout>
 
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Enter schedule title"
-            app:hintTextColor="@color/blue"
-            app:boxStrokeColor="@color/blue"
+            app:hintTextColor="?attr/colorOnSurface"
+            app:boxStrokeColor="?attr/colorOnSurface"
             app:boxStrokeWidth="1dp"
             android:padding="5dp"
             android:layout_marginBottom="5dp">
@@ -76,8 +77,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Enter schedule description"
-            app:hintTextColor="@color/blue"
-            app:boxStrokeColor="@color/blue"
+            app:hintTextColor="?attr/colorOnSurface"
+            app:boxStrokeColor="?attr/colorOnSurface"
             app:boxStrokeWidth="1dp"
             android:padding="5dp"
             android:layout_marginBottom="5dp">
@@ -99,8 +100,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Schedule Type"
-            app:hintTextColor="@color/blue"
-            app:boxStrokeColor="@color/blue"
+            app:hintTextColor="?attr/colorOnSurface"
+            app:boxStrokeColor="?attr/colorOnSurface"
             app:boxStrokeWidth="1dp"
             app:boxCornerRadiusTopStart="5dp"
             app:boxCornerRadiusTopEnd="5dp"
@@ -118,7 +119,7 @@
                 android:gravity="center"
                 android:textSize="16sp"
                 android:hint="Schedule Type"
-                android:textColor="@color/blue"
+                android:textColor="?attr/colorOnSurface"
                 android:focusable="false"
                 android:clickable="true" />
         </com.google.android.material.textfield.TextInputLayout>
@@ -138,8 +139,7 @@
                 android:gravity="center"
                 android:padding="8dp"
                 android:text="12/30/2000"
-                android:textColor="@color/blue"
-                android:textSize="14sp" />
+                android:textColor="?attr/colorOnSurface"                android:textSize="14sp" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/select_date_button"
@@ -150,7 +150,7 @@
                 android:padding="0dp"
                 android:backgroundTint="@color/transparent"
                 app:icon="@drawable/ic_date"
-                app:iconTint="@color/blue"
+                app:iconTint="?attr/colorOnSurface"
                 app:iconSize="28dp"
                 app:iconPadding="16dp"
                 app:cornerRadius="8dp" />
@@ -188,12 +188,12 @@
                 android:layout_width="0dp"
                 android:layout_height="48dp"
                 android:layout_weight="1"
-                android:text="Add"
-                android:textColor="@color/gold"
-                android:backgroundTint="@color/blue"
-                android:textSize="16sp"
-                android:textAllCaps="false"
+                android:backgroundTint="?attr/colorSecondary"
                 android:fontFamily="@font/dm_sans_semibold"
+                android:text="Add"
+                android:textAllCaps="false"
+                android:textColor="?attr/colorOnSecondary"
+                android:textSize="16sp"
                 app:cornerRadius="3dp" />
         </LinearLayout>
 

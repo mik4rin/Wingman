@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
-    android:background="@color/appbackround">
+    android:background="?android:attr/colorBackground">
 
     <LinearLayout
         android:id="@+id/pomodoroFragment"
@@ -29,7 +29,7 @@
                 android:contentDescription="Back"
                 android:scaleType="centerInside"
                 android:src="@drawable/ic_back"
-                app:tint="@color/blue"/>
+                app:tint="?attr/colorOnSurface"/>
 
             <TextView
                 android:layout_width="0dp"
@@ -38,7 +38,7 @@
                 android:fontFamily="@font/dm_sans_semibold"
                 android:gravity="center"
                 android:text="Pomodoro Timer"
-                android:textColor="@color/blue"
+                android:textColor="?attr/colorOnSurface"
                 android:textSize="18sp" />
 
             <View
@@ -54,7 +54,7 @@
             android:layout_marginBottom="20dp"
             app:cardCornerRadius="16dp"
             app:cardElevation="2dp"
-            app:cardBackgroundColor="@android:color/white">
+            app:cardBackgroundColor="@color/white">>
 
             <LinearLayout
                 android:id="@+id/modeSelector"
@@ -112,7 +112,7 @@
             android:layout_marginBottom="20dp"
             app:cardCornerRadius="20dp"
             app:cardElevation="6dp"
-            app:cardBackgroundColor="@color/blue">
+            app:cardBackgroundColor="?attr/colorCardBackground">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -184,11 +184,10 @@
                 android:layout_height="58dp"
                 android:layout_weight="1"
                 android:layout_marginEnd="12dp"
-                android:backgroundTint="@color/blue"
-                android:fontFamily="@font/dm_sans_bold"
+                android:textColor="?attr/colorOnSecondary"
+                android:backgroundTint="?attr/colorSecondary"                android:fontFamily="@font/dm_sans_bold"
                 android:text="Start"
                 android:textAllCaps="false"
-                android:textColor="@color/gold"
                 android:textSize="17sp"
                 android:elevation="4dp" />
 

@@ -22,7 +22,7 @@
             android:layout_marginStart="8dp"
             android:scaleType="centerInside"
             android:src="@drawable/ic_back"
-            app:tint="@color/blue"/>
+            app:tint="?attr/colorOnSurface"/>
 
         <View
             android:layout_width="0dp"
@@ -35,11 +35,11 @@
             android:layout_height="wrap_content"
             android:text="Create"
             android:textAllCaps="false"
-            android:textColor="@color/gold"
             app:cornerRadius="3dp"
             android:textSize="16sp"
             android:fontFamily="@font/dm_sans_semibold"
-            app:backgroundTint="@color/blue"/>
+            android:textColor="?attr/colorOnSecondary"
+            android:backgroundTint="?attr/colorSecondary"/>
     </LinearLayout>
 
     <TextView
@@ -48,7 +48,7 @@
         android:text="Create a new flashcard set"
         android:fontFamily="@font/dm_sans_semibold"
         android:textAlignment="center"
-        android:textColor="@color/blue"
+        android:textColor="?attr/colorOnSurface"
         android:textStyle="bold"
         android:textSize="18sp"
         android:layout_marginBottom="16dp"/>
@@ -57,8 +57,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Title"
-        app:hintTextColor="@color/blue"
-        app:boxStrokeColor="@color/blue"
+        app:hintTextColor="?attr/colorOnSurface"
+        app:boxStrokeColor="?attr/colorOnSurface"
         android:layout_marginTop="8dp">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -77,8 +77,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Enter description"
-        app:hintTextColor="@color/blue"
-        app:boxStrokeColor="@color/blue"
+        app:hintTextColor="?attr/colorOnSurface"
+        app:boxStrokeColor="?attr/colorOnSurface"
         android:layout_marginTop="8dp">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -107,11 +107,11 @@
         android:layout_height="wrap_content"
         android:text="Add a Card"
         android:textAllCaps="false"
-        android:textColor="@color/gold"
         app:cornerRadius="3dp"
         android:layout_marginTop="12dp"
         android:textSize="16sp"
         android:fontFamily="@font/dm_sans_semibold"
         android:layout_gravity="center"
-        app:backgroundTint="@color/blue"/>
+        android:textColor="?attr/colorOnSecondary"
+        android:backgroundTint="?attr/colorSecondary"/>
 </LinearLayout>
