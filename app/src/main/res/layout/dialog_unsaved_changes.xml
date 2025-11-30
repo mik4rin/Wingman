@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="@drawable/bgborder">
+
+    <TextView
+        android:id="@+id/dialogTitleText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Confirm Action"
+        android:textSize="20sp"
+        android:fontFamily="@font/dm_sans_bold"
+        android:textColor="?attr/colorOnSurface"
+        android:gravity="center"
+        android:layout_marginBottom="16dp" />
+
+    <TextView
+        android:id="@+id/dialogMessageText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Are you sure you want to continue?"
+        android:textSize="14sp"
+        android:fontFamily="@font/dm_sans_semibold"
+        android:textColor="?attr/colorOnSurface"
+        android:gravity="center"
+        android:layout_marginBottom="24dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center">
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/buttonNo"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:backgroundTint="@color/gold"
+            android:fontFamily="@font/dm_sans_semibold"
+            android:text="No"
+            android:textAllCaps="false"
+            android:textColor="@color/blue"
+            android:textSize="16sp" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnYes"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Yes"
+            android:textAllCaps="false"
+            android:textSize="16sp"
+            android:fontFamily="@font/dm_sans_bold"
+            android:textColor="?attr/colorOnSecondary"
+            android:backgroundTint="?attr/colorSecondary"            android:layout_marginStart="8dp" />
+
+    </LinearLayout>
+
+</LinearLayout>
