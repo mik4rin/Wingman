@@ -1,50 +1,45 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Base Dark Theme -->
-    <style name="Base.Theme.AddNotes" parent="Theme.Material3.Dark.NoActionBar">
+    <style name="Base.Theme.Wingman" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="colorPrimary">#121212</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="colorCardBackground">#2E2E2E</item>
+        <item name="colorText">#FFFFFF</item>
+    </style>
 
-        <!-- Primary colors -->
+    <style name="Theme.Wingman" parent="Base.Theme.Wingman" />
+
+    <style name="Base.Theme.AddNotes" parent="Theme.Material3.Dark.NoActionBar">
         <item name="colorPrimary">#121212</item>
         <item name="colorOnPrimary">#FFFFFFFF</item>
         <item name="colorPrimaryContainer">#3C3C3C</item>
 
-        <!-- Secondary colors -->
         <item name="colorSecondary">#FFFFFF</item>
         <item name="colorOnSecondary">#000000</item>
         <item name="colorSecondaryVariant">#2E2E2E</item>
 
-
-        <!-- Background & Surfaces -->
         <item name="android:colorBackground">#212121</item>
         <item name="colorCardBackground">#2E2E2E</item>
 
         <item name="colorSurfaceContainer">#c7b57e</item>
 
-
-        <item name="colorSurface">#2E2E2E</item> <!-- lighter gray for cards -->
-        <item name="colorOnSurface">#FFFFFF</item>
+        <item name="colorSurface">#2E2E2E</item> <item name="colorOnSurface">#FFFFFF</item>
 
         <item name="colorSurfaceVariant">#333333</item>
+        <item name="colorText">#FFFFFF</item>
 
-        <item name="colorText">#2E2E2E</item>
-
-        <!-- Cards -->
         <item name="materialCardViewStyle">@style/CustomCardViewStyle</item>
     </style>
 
-    <!-- Card Style (lighter gray) -->
     <style name="CustomCardViewStyle" parent="Widget.MaterialComponents.CardView">
         <item name="cardBackgroundColor">#2E2E2E</item>
         <item name="android:foreground">?attr/selectableItemBackground</item>
     </style>
 
-    <!-- Popup Menu (Dark Mode) -->
     <style name="PopupMenuTheme" parent="ThemeOverlay.Material3.Dark">
         <item name="android:popupBackground">?attr/colorSurface</item>
         <item name="android:textColor">?attr/colorOnSurface</item>
     </style>
-
-
 
     <style name="ScheduleDialog" parent="Theme.Material3.DayNight.Dialog">
         <item name="colorSurface">#212121</item>
@@ -53,6 +48,5 @@
         <item name="colorOnSecondary">#000000</item>
     </style>
 
-    <!-- Main Theme -->
     <style name="Theme.AddNotes" parent="Base.Theme.AddNotes" />
 </resources>
